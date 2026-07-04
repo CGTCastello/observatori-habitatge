@@ -3,9 +3,143 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Observatori de l'Habitatge de Castelló — Quant costa viure ací?</title>
+<title>Observatori de l'Habitatge de Castelló — Preu del lloguer, salaris i desnonaments amb dades oficials</title>
 <meta name="description" content="Preu real del lloguer, salaris, desnonaments i vivenda turística a Castelló de la Plana amb dades oficials (SERPAVI, INE, AEAT, CGPJ). Calcula quant et costa viure.">
+<link rel="canonical" href="https://cgtcastello.org/observatori-habitatge/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ca_ES">
+<meta property="og:site_name" content="Observatori de l'Habitatge de Castelló">
+<meta property="og:title" content="Quant et costa viure a Castelló? Les dades oficials de la vivenda">
+<meta property="og:description" content="El lloguer real ha pujat un 59% des de 2015; els salaris, un 36%. Dades oficials de lloguer, salaris i desnonaments, i una calculadora per a la teua situació.">
+<meta property="og:url" content="https://cgtcastello.org/observatori-habitatge/">
+<meta property="og:image" content="https://cgtcastello.org/observatori-habitatge/img/og-va.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="css/estils.css">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://cgtcastello.org/#org",
+      "name": "CGT Castelló",
+      "url": "https://cgtcastello.org",
+      "description": "Confederació General del Treball de Castelló, sindicat anarcosindicalista."
+    },
+    {
+      "@type": "WebSite",
+      "name": "Observatori de l'Habitatge de Castelló",
+      "url": "https://cgtcastello.org/observatori-habitatge/",
+      "inLanguage": "ca",
+      "publisher": { "@id": "https://cgtcastello.org/#org" }
+    },
+    {
+      "@type": "Dataset",
+      "name": "Lloguer real a Castelló de la Plana (SERPAVI)",
+      "description": "Sèrie anual 2011-2024 del lloguer de contractes reals declarats fiscalment a Castelló de la Plana i província: mediana, P25 i P75 de €/m²/mes i €/mes, per municipi i secció censal.",
+      "url": "https://cgtcastello.org/observatori-habitatge/#lloguer",
+      "creator": { "@id": "https://cgtcastello.org/#org" },
+      "isBasedOn": "https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/serpavi",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": [{
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/alquiler_serpavi.json"
+      }]
+    },
+    {
+      "@type": "Dataset",
+      "name": "Salaris i taxa d'esforç a Castelló",
+      "description": "Salari mitjà anual de la província de Castelló (AEAT, 2008-2024), distribució per trams d'SMI i taxa d'esforç del lloguer sobre el salari net estimat.",
+      "url": "https://cgtcastello.org/observatori-habitatge/#salaris",
+      "creator": { "@id": "https://cgtcastello.org/#org" },
+      "isBasedOn": "https://sede.agenciatributaria.gob.es/Sede/datosabiertos/catalogo/hacienda/Mercado_de_Trabajo_y_Pensiones_en_las_Fuentes_Tributarias.shtml",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": [{
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/salarios_aeat.json"
+      }]
+    },
+    {
+      "@type": "Dataset",
+      "name": "Desnonaments a la província de Castelló",
+      "description": "Llançaments practicats per trimestre i causa (lloguer LAU, execució hipotecària, altres) a la província de Castelló des de 2013, i sèrie anual del partit judicial de Castelló de la Plana. Font: CGPJ.",
+      "url": "https://cgtcastello.org/observatori-habitatge/#desnonaments",
+      "creator": { "@id": "https://cgtcastello.org/#org" },
+      "isBasedOn": "https://www.poderjudicial.es/cgpj/es/Temas/Estadistica-Judicial/Estudios-e-Informes/Efecto-de-la-Crisis-en-los-organos-judiciales/",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": [{
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/indicadores.json"
+      }]
+    },
+    {
+      "@type": "Dataset",
+      "name": "Renda i lloguer per seccions censals de Castelló de la Plana",
+      "description": "Renda neta mitjana per persona i llar (ADRH, INE) i lloguer €/m² (SERPAVI) per a les 110 seccions censals de Castelló de la Plana.",
+      "url": "https://cgtcastello.org/observatori-habitatge/#mapa",
+      "creator": { "@id": "https://cgtcastello.org/#org" },
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": [
+        { "@type": "DataDownload", "encodingFormat": "application/json",
+          "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/mapa_renta.json" },
+        { "@type": "DataDownload", "encodingFormat": "application/json",
+          "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/mapa_alquiler.json" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Quant costa llogar un pis a Castelló de la Plana?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Segons els contractes reals declarats fiscalment (SERPAVI, MIVAU), el lloguer mitjà (mediana) a Castelló de la Plana el 2024 era de 500 €/mes i 5,43 €/m²/mes per a vivenda col·lectiva. El 25% de contractes més cars superava els 600 €/mes." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quant ha pujat el lloguer a Castelló?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Entre 2015 i 2024 el lloguer real per m² a Castelló de la Plana ha pujat un 59% (SERPAVI, MIVAU), mentre que l'IPC provincial va pujar un 25% i el salari mitjà un 36% en el mateix període." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quin és el sou mitjà a Castelló?",
+          "acceptedAnswer": { "@type": "Answer", "text": "El salari mitjà brut de la província de Castelló el 2024 era de 23.117 € anuals segons l'AEAT (Mercat de Treball en les Fonts Tributàries). Esta xifra promedia totes les relacions laborals de l'any, sense ajustar per jornada, i per tant infravalora el salari a temps complet." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quina part del sou se'n va en llogar a Castelló?",
+          "acceptedAnswer": { "@type": "Answer", "text": "El 2024, el lloguer mitjà (500 €/mes) suposava el 32,9% del salari net mitjà estimat de la província: per damunt del llindar del 30% que es considera sobrecàrrega de despesa en vivenda." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quants desnonaments hi ha a Castelló?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Entre 2013 i 2025 es van executar 10.873 llançaments (desnonaments amb intervenció judicial) a la província de Castelló segons el CGPJ. El 2025 van ser 302, i el 74% van ser per impagament del lloguer (LAU)." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quant costa comprar una vivenda a Castelló?",
+          "acceptedAnswer": { "@type": "Answer", "text": "El valor taxat mitjà de la vivenda lliure a Castelló de la Plana el 2025 era de 1.339 €/m² (MIVAU): una vivenda de 90 m² costava uns 120.500 €, l'equivalent a 4,5 anys del salari brut mitjà de la província." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quantes vivendes turístiques hi ha a Castelló?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A Castelló de la Plana hi havia 634 vivendes d'ús turístic inscrites al registre de la Generalitat (juliol de 2026) i l'INE n'estimava 393 anunciades en plataformes (maig de 2026), un 0,43% del parc. A la província, Orpesa (3.181), Peníscola (2.999) i Alcalà de Xivert (2.172) encapçalen el registre." }
+        },
+        {
+          "@type": "Question",
+          "name": "Quina és la renda mitjana per barris a Castelló de la Plana?",
+          "acceptedAnswer": { "@type": "Answer", "text": "La renda neta mitjana era de 14.696 € per persona el 2023 (ADRH, INE), amb una desigualtat forta entre barris: de 9.276 € a la secció més pobra fins a 24.777 € a la més rica." }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -244,14 +378,23 @@
     </div>
   </section>
 
-  <!-- ================= MAPA (fase 4) ================= -->
+  <!-- ================= MAPA ================= -->
   <section id="mapa" aria-labelledby="titolMapa">
     <div class="contenidor">
       <h2 id="titolMapa">El mapa de la desigualtat</h2>
       <p class="entradeta">Renda mitjana i lloguer per secció censal de
         Castelló ciutat: la diferència de renda entre barris arriba a ser de
-        més de 15.000 € per persona i any. <em>(Mapa interactiu disponible
-        pròximament.)</em></p>
+        més de 15.000 € per persona i any. Canvia de capa i passa el dit o el
+        ratolí per cada secció.</p>
+      <div class="commutador" role="group" aria-label="Tria de capa del mapa">
+        <button type="button" data-capa="renda" class="actiu" aria-pressed="true">Renda per persona</button>
+        <button type="button" data-capa="lloguer" aria-pressed="false">Lloguer €/m²</button>
+      </div>
+      <div id="elMapa" role="application" aria-label="Mapa de coropletes de les seccions censals de Castelló de la Plana amb renda mitjana i lloguer"></div>
+      <p id="llegendaMapa" class="llegenda" aria-live="polite"></p>
+      <p class="calc-nota" style="color:var(--gris)">El lloguer per secció ve
+        de SERPAVI (seccionat del cens de 2011) i la renda de l'ADRH (seccionat
+        vigent): alguna secció pot no coincidir exactament entre capes.</p>
     </div>
   </section>
 
@@ -354,7 +497,9 @@
 
 <script src="data/data.js"></script>
 <script src="vendor/chart.umd.min.js"></script>
+<script src="vendor/leaflet.js"></script>
 <script src="js/config.js"></script>
 <script src="js/app.js"></script>
+<script src="js/mapa.js"></script>
 </body>
 </html>

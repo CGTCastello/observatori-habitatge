@@ -145,6 +145,26 @@ button.compartir {
 }
 button.compartir:hover { background: var(--roig-fosc); }
 
+/* ---------- mapa ---------- */
+#elMapa {
+  height: 26rem; border: 1px solid var(--gris-clar); border-radius: 4px;
+  background: #dfe8ee; z-index: 1;
+}
+@media (min-width: 700px) { #elMapa { height: 32rem; } }
+.commutador { margin: 1rem 0 .8rem; }
+.commutador button {
+  font-size: .95rem; font-weight: 700; padding: .5rem 1rem; cursor: pointer;
+  border: 2px solid var(--negre); background: var(--blanc); color: var(--negre);
+  border-radius: 4px 0 0 4px;
+}
+.commutador button + button { border-left: 0; border-radius: 0 4px 4px 0; }
+.commutador button.actiu { background: var(--negre); color: var(--blanc); }
+.llegenda { font-size: .8rem; color: var(--gris); line-height: 1.9; }
+.llegenda .clau {
+  display: inline-block; width: .9rem; height: .9rem; vertical-align: -2px;
+  margin-right: .25rem; border: 1px solid rgba(0,0,0,.15);
+}
+
 /* ---------- dades clau (SEO/AEO) ---------- */
 #dades-clau ul { padding-left: 1.2rem; }
 #dades-clau li { margin: .4rem 0; }

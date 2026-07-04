@@ -266,7 +266,7 @@ def main():
 # como fallback para abrir index.html con file://)
 FICHEROS_WEB = ["indicadores.json", "meta.json", "alquiler_serpavi.json",
                 "salarios_aeat.json", "precio_vivienda.json", "hipotecas.json",
-                "mapa_alquiler.json", "mapa_renta.json"]
+                "mapa_alquiler.json", "mapa_renta.json", "secciones.geojson"]
 
 
 def export_web():
@@ -279,7 +279,8 @@ def export_web():
             die(f"export web: falta data/{nombre}")
         contenido = origen.read_text(encoding="utf-8")
         (destino / nombre).write_text(contenido, encoding="utf-8")
-        inline[nombre.replace(".json", "")] = json.loads(contenido)
+        clave = nombre.replace(".geojson", "_geojson").replace(".json", "")
+        inline[clave] = json.loads(contenido)
     datajs = destino / "data.js"
     datajs.write_text(
         "// Generado por build_all.py — NO editar a mano. Fallback para file://\n"
