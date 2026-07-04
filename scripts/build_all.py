@@ -36,7 +36,55 @@ RANGOS = {
     "desahucios_acumulado": (3000, 40000),
     "vt_castello_ine": (50, 5000),
     "fianzas_ultimo": (1000, 30000),
+    "esfuerzo_1smi_pct": (25, 70),           # alquiler mediano sobre neto de 1 SMI
 }
+
+# Parámetros IRPF/SS 2024 para el neto por niveles salariales (indicador
+# "esfuerzo por niveles"). Modelo simplificado pero citable: cotización del
+# trabajador, gastos deducibles, reducción por rendimientos del trabajo
+# (art. 20 LIRPF, cuantías 2024), mínimo personal general y escala estatal
+# duplicada como aproximación de la tarifa total.
+IRPF_2024 = {
+    "ss_pct": 0.0648,
+    "gastos": 2000,
+    "reduccion": [(14_852, None, 7302),
+                  (17_673.52, 1.75, 7302), (19_747.5, 1.14, 2364.34)],
+    "minimo_personal": 5550,
+    "escala": [(12_450, 0.19), (20_200, 0.24), (35_200, 0.30),
+               (60_000, 0.37), (300_000, 0.45), (float("inf"), 0.47)],
+}
+
+
+def neto_anual_2024(bruto):
+    """Neto anual estimado con los parámetros IRPF_2024. Aproximación
+    documentada en la metodología; no sustituye a una nómina real."""
+    p = IRPF_2024
+    ss = bruto * p["ss_pct"]
+    rn = bruto - ss - p["gastos"]
+    reduccion = 0.0
+    if rn <= p["reduccion"][0][0]:
+        reduccion = p["reduccion"][0][2]
+    else:
+        for tope, pendiente, base_red in p["reduccion"][1:]:
+            if rn <= tope:
+                limite_previo = (p["reduccion"][0][0] if base_red == 7302
+                                 else p["reduccion"][1][0])
+                reduccion = max(0.0, base_red - pendiente * (rn - limite_previo))
+                break
+    base = max(0.0, rn - reduccion)
+
+    def tarifa(cantidad):
+        cuota, previo = 0.0, 0.0
+        for tope, tipo in p["escala"]:
+            tramo = min(cantidad, tope) - previo
+            if tramo <= 0:
+                break
+            cuota += tramo * tipo
+            previo = tope
+        return cuota
+
+    cuota = max(0.0, tarifa(base) - tarifa(min(base, p["minimo_personal"])))
+    return bruto - ss - cuota
 
 
 def check(clave, valor):
@@ -118,6 +166,53 @@ def anyos_para_comprar(precio, salarios):
     check("anyos_salario_ultimo", serie[u])
     return {"nota": f"precio = valor tasado €/m² × {SUPERFICIE_TIPO} m²; "
                     "salario bruto anual AEAT", "serie": serie}
+
+
+def esfuerzo_niveles(alq_muni, salarios, smi):
+    """Tasa de esfuerzo del alquiler mediano según el nivel salarial (año de
+    los tramos AEAT): 1/1,5/2 SMI y salario medio, con % de asalariados de la
+    provincia que cobra hasta ese nivel."""
+    t = salarios["tramos_smi"]
+    anyo = t["anyo"]
+    if anyo not in alq_muni or anyo not in smi:
+        die(f"esfuerzo_niveles: falta alquiler o SMI de {anyo}")
+    alquiler = alq_muni[anyo]["vc"]["eur_mes"]
+    smi_anual = smi[anyo] * 14
+
+    # % de asalariados hasta n SMI, acumulando tramos
+    total, acum, hasta = t["asalariados_total"], 0, {}
+    for etiqueta, n in t["tramos"].items():
+        acum += n
+        tope = etiqueta.split(" a ")[-1].replace(",", ".")
+        if tope in ("1", "1.5", "2"):
+            hasta[float(tope)] = rnd(100 * acum / total, 1)
+
+    niveles = {}
+    for nombre, bruto, mult in [("1 SMI", smi_anual, 1.0),
+                                ("1,5 SMI", smi_anual * 1.5, 1.5),
+                                ("2 SMI", smi_anual * 2, 2.0),
+                                ("salario medio", None, None)]:
+        if bruto is None:
+            bruto = salarios["serie"][anyo]["salario_medio_eur"]
+        neto_mes = neto_anual_2024(bruto) / 12
+        niveles[nombre] = {
+            "bruto_anual": rnd(bruto, 0),
+            "neto_mes_estimado": rnd(neto_mes, 0),
+            "tasa_alquiler_mediano_pct": rnd(100 * alquiler["mediana"] / neto_mes, 1),
+            "tasa_alquiler_p25_pct": rnd(100 * alquiler["p25"] / neto_mes, 1),
+            "pct_asalariados_hasta": hasta.get(mult),
+        }
+    check("esfuerzo_1smi_pct", niveles["1 SMI"]["tasa_alquiler_mediano_pct"])
+    return {
+        "anyo": anyo,
+        "nota": "Neto estimado con cotización del 6,48%, gastos deducibles, "
+                "reducción por rendimientos del trabajo y escala estatal "
+                "duplicada (parámetros 2024): aproximación, no una nómina. "
+                "pct_asalariados_hasta incluye jornadas parciales y años "
+                "incompletos (fuente AEAT, sin ajuste por tiempo trabajado).",
+        "alquiler": alquiler,
+        "niveles": niveles,
+    }
 
 
 def salario_real(salarios, ipc):
@@ -238,6 +333,7 @@ def main():
         "indice100": indice100(alq_muni, fuentes["precio_vivienda"],
                                fuentes["salarios_aeat"], fuentes["ipc"]),
         "tasa_esfuerzo": tasa_esfuerzo(alq_muni, fuentes["salarios_aeat"]),
+        "esfuerzo_niveles": esfuerzo_niveles(alq_muni, fuentes["salarios_aeat"], smi),
         "anyos_para_comprar": anyos_para_comprar(fuentes["precio_vivienda"],
                                                  fuentes["salarios_aeat"]),
         "salario_real": salario_real(fuentes["salarios_aeat"], fuentes["ipc"]),

@@ -36,6 +36,15 @@ La URL del XLSX de SERPAVI cambia con cada publicación anual: está en la
 constante `XLSX_URL` de `scripts/fetch_serpavi.py`, con instrucciones para
 actualizarla.
 
+## Formación
+
+`formacion/` contiene el material de la sesión formativa interna: guion de 90
+minutos (`guion-sessio.md`) y argumentario de réplicas con fuente
+(`argumentario.md`). Las cifras marcadas con ⟵ se revisan tras cada build
+anual. El indicador `esfuerzo_niveles` de `data/indicadores.json` (tasa de
+esfuerzo por niveles salariales: 1/1,5/2 SMI y salario medio) se calcula en
+`build_all.py` con un neto estimado documentado (IRPF/SS 2024).
+
 ## Estado
 
 - [x] Fase 1a: `fetch_serpavi.py`, `fetch_ine.py`
