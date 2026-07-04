@@ -1,0 +1,20 @@
+# Datos introducidos a mano. Las líneas que empiezan por # se ignoran.
+# indicador: smi_mensual | oferta_alquiler_m2 | oferta_venta_m2
+# fecha: AAAA (anual) o AAAA-MM (mensual). valor con punto decimal.
+# El SMI es mensual en 14 pagas (BOE, Ministerio de Trabajo y Economía Social).
+indicador,fecha,valor,unidad,fuente,url
+smi_mensual,2015,648.60,eur_mes_14pagas,RD 1106/2014 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2014-13518
+smi_mensual,2016,655.20,eur_mes_14pagas,RD 1171/2015 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2015-14210
+smi_mensual,2017,707.70,eur_mes_14pagas,RD 742/2016 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2016-12486
+smi_mensual,2018,735.90,eur_mes_14pagas,RD 1077/2017 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2017-15848
+smi_mensual,2019,900.00,eur_mes_14pagas,RD 1462/2018 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2018-17773
+smi_mensual,2020,950.00,eur_mes_14pagas,RD 231/2020 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2020-1652
+smi_mensual,2021,965.00,eur_mes_14pagas,RD 817/2021 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2021-15770
+smi_mensual,2022,1000.00,eur_mes_14pagas,RD 152/2022 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2022-2851
+smi_mensual,2023,1080.00,eur_mes_14pagas,RD 99/2023 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2023-4148
+smi_mensual,2024,1134.00,eur_mes_14pagas,RD 145/2024 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2024-2160
+smi_mensual,2025,1184.00,eur_mes_14pagas,RD 87/2025 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2025-2529
+smi_mensual,2026,1221.00,eur_mes_14pagas,RD 126/2026 (BOE),https://www.boe.es/buscar/doc.php?id=BOE-A-2026-3815
+# --- Rellenar a mano antes del lanzamiento (dato de OFERTA, no de contratos): ---
+# oferta_alquiler_m2,2026-06,X.XX,eur_m2_mes,Informe mensual Idealista Castelló de la Plana,https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/
+# oferta_venta_m2,2026-06,XXXX,eur_m2,Informe mensual Idealista Castelló de la Plana,https://www.idealista.com/sala-de-prensa/informes-precio-vivienda/
