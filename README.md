@@ -39,5 +39,5 @@ actualizarla.
 - [x] Fase 1a: `fetch_serpavi.py`, `fetch_ine.py`
 - [x] Fase 1b: `fetch_cgpj.py`, `fetch_vt.py`, `fetch_aeat.py`, `manual_inputs.csv`
 - [x] Fase 2: indicadores derivados en `build_all.py` + `data/meta.json`
-- [ ] Fase 3: web one-page en valenciano (Chart.js + calculadora)
+- [x] Fase 3: web one-page en valenciano (Chart.js + calculadora) — textos pendientes de revisión
 - [ ] Fase 4: mapa Leaflet, versión /es/, SEO (JSON-LD, hreflang, sitemap)

@@ -258,7 +258,36 @@ def main():
                     for k, v in fuentes.items()},
     }
     write_json("meta.json", meta)
+    export_web()
     log("build completado")
+
+
+# ficheros que consume la web (se copian a web/data/ y se inyectan en data.js
+# como fallback para abrir index.html con file://)
+FICHEROS_WEB = ["indicadores.json", "meta.json", "alquiler_serpavi.json",
+                "salarios_aeat.json", "precio_vivienda.json", "hipotecas.json",
+                "mapa_alquiler.json", "mapa_renta.json"]
+
+
+def export_web():
+    destino = ROOT / "web" / "data"
+    destino.mkdir(parents=True, exist_ok=True)
+    inline = {}
+    for nombre in FICHEROS_WEB:
+        origen = DATA_DIR / nombre
+        if not origen.exists():
+            die(f"export web: falta data/{nombre}")
+        contenido = origen.read_text(encoding="utf-8")
+        (destino / nombre).write_text(contenido, encoding="utf-8")
+        inline[nombre.replace(".json", "")] = json.loads(contenido)
+    datajs = destino / "data.js"
+    datajs.write_text(
+        "// Generado por build_all.py — NO editar a mano. Fallback para file://\n"
+        "window.OBSERVATORI_DADES = "
+        + json.dumps(inline, ensure_ascii=False, separators=(",", ":")) + ";\n",
+        encoding="utf-8")
+    log(f"export web: {len(FICHEROS_WEB)} JSON + data.js "
+        f"({datajs.stat().st_size / 1024:.0f} KB)")
 
 
 if __name__ == "__main__":

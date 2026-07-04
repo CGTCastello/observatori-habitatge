@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "observatori",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/private/tmp/claude-501/-Users-francescgomezmanteca-Desktop-OBSER/63e56734-fef4-4540-8b78-05be2d6d64b3/scratchpad/serve.py"],
+      "port": 8642
+    }
+  ]
+}

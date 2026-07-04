@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observatori de l'Habitatge de Castelló — Quant costa viure ací?</title>
+<meta name="description" content="Preu real del lloguer, salaris, desnonaments i vivenda turística a Castelló de la Plana amb dades oficials (SERPAVI, INE, AEAT, CGPJ). Calcula quant et costa viure.">
+<link rel="stylesheet" href="css/estils.css">
+</head>
+<body>
+
+<header class="principal">
+  <div class="contenidor">
+    <a class="logo-cgt" href="#inici">CGT Castelló</a>
+    <nav class="ancores" aria-label="Seccions">
+      <a href="#calculadora">Calculadora</a>
+      <a href="#lloguer">Lloguer</a>
+      <a href="#salaris">Salaris</a>
+      <a href="#compra">Compra</a>
+      <a href="#desnonaments">Desnonaments</a>
+      <a href="#turistica">Vivenda turística</a>
+      <a href="#metodologia">Metodologia</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inici">
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="contenidor">
+      <h1>Vivenda a Castelló: <em>les dades</em> de per què no arribes a final de mes</h1>
+      <p class="subtitol">Totes les xifres d'esta pàgina venen de fonts públiques
+        oficials, amb enllaç i any de la dada. Ni opinions ni titulars buits:
+        contractes reals, salaris declarats i desnonaments executats.</p>
+      <div class="cifres">
+        <div class="cifra">
+          <strong id="xifraEsforc">–</strong>
+          <span>del salari net mitjà se'n va en llogar</span>
+          <span class="font">SERPAVI + AEAT · <span id="xifraEsforcAny"></span></span>
+        </div>
+        <div class="cifra">
+          <strong id="xifraLloguer">–</strong>
+          <span>ha pujat el lloguer real per m² a la ciutat</span>
+          <span class="font">SERPAVI (MIVAU) · <span id="xifraLloguerAny"></span></span>
+        </div>
+        <div class="cifra">
+          <strong id="xifraDesnonaments">–</strong>
+          <span>desnonaments executats a la província</span>
+          <span class="font">CGPJ · <span id="xifraDesnonamentsAny"></span></span>
+        </div>
+        <div class="cifra">
+          <strong id="xifraLau">–</strong>
+          <span>dels desnonaments de l'últim any són per lloguer</span>
+          <span class="font">CGPJ · <span id="xifraLauAny"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="contenidor" id="avisError" hidden>⚠ No s'han pogut carregar les
+    dades. Si has obert el fitxer directament, comprova que la carpeta
+    <code>data/</code> està al costat de l'<code>index.html</code>.</p>
+
+  <!-- ================= CALCULADORA ================= -->
+  <section id="calculadora" aria-labelledby="titolCalc">
+    <div class="contenidor">
+      <h2 id="titolCalc">Quant et costa viure?</h2>
+      <p>Posa el teu sou i el teu lloguer (o hipoteca) i mira què diuen els
+        números de la teua situació.</p>
+      <div class="calc-caixa">
+        <div class="calc-camps">
+          <div>
+            <label for="inpSalari">Salari net mensual (€)</label>
+            <input type="number" id="inpSalari" min="0" max="5000" step="10" value="1300" inputmode="numeric">
+            <input type="range" id="inpSalariRang" min="400" max="4000" step="10" value="1300" aria-label="Salari net mensual (control lliscant)">
+          </div>
+          <div>
+            <label for="inpLloguer">Lloguer o quota mensual (€)</label>
+            <input type="number" id="inpLloguer" min="0" max="3000" step="10" value="600" inputmode="numeric">
+          </div>
+          <div>
+            <label for="inpAny">Compara el teu sou amb l'any…</label>
+            <select id="inpAny"></select>
+          </div>
+        </div>
+        <div class="calc-resultats">
+          <div class="resultat" id="resEsforc">
+            <strong>–</strong>
+            <span>del teu sou se'n va en vivenda · <span id="resEsforcNota"></span></span>
+          </div>
+          <div class="resultat" id="resDies">
+            <strong>–</strong>
+            <span>dies al mes treballes només per a pagar la vivenda</span>
+          </div>
+          <div class="resultat" id="resPoder">
+            <strong>–</strong>
+            <span id="resPoderNota"></span>
+          </div>
+          <div class="resultat" id="resComprar">
+            <strong>–</strong>
+            <span id="resComprarNota"></span>
+          </div>
+        </div>
+        <button class="compartir" id="btnCompartir">Compartix el teu resultat</button>
+        <p class="calc-nota">Càlcul orientatiu fet al teu navegador: no
+          s'envia cap dada. Constants (IPC provincial, preu taxat, mitjanes
+          locals) actualitzades amb les fonts i dates indicades a la
+          <a href="#metodologia">metodologia</a>. El llindar del 30% és el
+          criteri estàndard de sobrecàrrega de despesa en vivenda.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LLOGUER ================= -->
+  <section id="lloguer" aria-labelledby="titolLloguer">
+    <div class="contenidor">
+      <h2 id="titolLloguer">El lloguer, disparat</h2>
+      <p class="entradeta">Este gràfic és la foto del problema: des de 2015 el
+        lloguer puja molt més ràpid que els salaris i que la vida en general.
+        Les dades de lloguer són de <strong>contractes reals</strong> declarats
+        a Hisenda (SERPAVI), no d'anuncis de portals.</p>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafIndex100" role="img" aria-label="Gràfic de línies: evolució des de 2015 (base 100) del lloguer per metre quadrat, el preu de compra, el salari mitjà i l'IPC a Castelló"></canvas>
+        </div>
+        <figcaption>Índex 100 = valor de 2015. Lloguer: SERPAVI, Castelló ciutat.
+          Compra: valor taxat MIVAU, ciutat. Salari: AEAT, província. IPC: INE, província.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafLloguer" role="img" aria-label="Gràfic de línies: lloguer mensual mitjà de contractes reals a Castelló ciutat, amb el rang entre el percentil 25 i el 75"></canvas>
+        </div>
+        <figcaption>Lloguer mensual de contractes reals (mediana i rang P25–P75),
+          vivenda col·lectiva. Font: SERPAVI (MIVAU), Castelló de la Plana.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafFiances" role="img" aria-label="Gràfic de barres: contractes de lloguer nous per any a Castelló ciutat segons les fiances dipositades"></canvas>
+        </div>
+        <figcaption>Fiances de lloguer dipositades a la Generalitat = contractes
+          nous firmats cada any. Font: Registre de fiances, GVA dades obertes.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= SALARIS ================= -->
+  <section id="salaris" aria-labelledby="titolSalaris">
+    <div class="contenidor">
+      <h2 id="titolSalaris">Els salaris no seguixen el ritme</h2>
+      <p class="entradeta">El salari mitjà de la província ha pujat, però molt
+        menys que el lloguer: <strong>el lloguer per m² ha pujat quasi el doble
+        que els salaris des de 2015</strong>. I la mitjana amaga la distribució:
+        mira quanta gent cobra per davall de l'SMI (contractes parcials i
+        temporals inclosos).</p>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafSalaris" role="img" aria-label="Gràfic de línies: salari mitjà anual nominal i salari real en euros de 2015 a la província de Castelló"></canvas>
+        </div>
+        <figcaption>Salari mitjà anual brut per perceptor (totes les relacions
+          laborals de l'any, sense ajustar per jornada: infravalora el salari a
+          temps complet). Font: AEAT, província de Castelló. Real: deflactat amb
+          l'IPC provincial (INE).</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafTrams" role="img" aria-label="Gràfic de barres horitzontals: distribució dels assalariats de la província per trams de salari en múltiples de l'SMI"></canvas>
+        </div>
+        <figcaption>Distribució dels assalariats per trams de salari anual, en
+          múltiples de l'SMI. Font: AEAT, província de Castelló.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= COMPRA ================= -->
+  <section id="compra" aria-labelledby="titolCompra">
+    <div class="contenidor">
+      <h2 id="titolCompra">Comprar tampoc és l'eixida</h2>
+      <p class="entradeta">El preu taxat de la vivenda a la ciutat torna a
+        pujar des de 2020 i les hipoteques firmades s'han més que duplicat en
+        una dècada. La vivenda com a inversió, no com a dret.</p>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafCompra" role="img" aria-label="Gràfic de línies: anys de salari brut mitjà necessaris per a comprar una vivenda de 90 metres quadrats a Castelló ciutat"></canvas>
+        </div>
+        <figcaption>Anys de salari brut mitjà (AEAT) per a pagar una vivenda de
+          90 m² al valor taxat mitjà de la ciutat (MIVAU).</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafHipoteques" role="img" aria-label="Gràfic de barres: hipoteques constituïdes sobre vivendes cada any a la província de Castelló"></canvas>
+        </div>
+        <figcaption>Hipoteques constituïdes sobre vivendes a la província.
+          Font: INE, Estadística d'Hipoteques.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= DESNONAMENTS ================= -->
+  <section id="desnonaments" aria-labelledby="titolDesnonaments">
+    <div class="contenidor">
+      <h2 id="titolDesnonaments">Desnonaments: ara, per lloguer</h2>
+      <p class="entradeta">Els llançaments (desnonaments executats amb
+        intervenció judicial) han canviat de cara: el 2015 la majoria eren per
+        hipoteca; hui, <strong>3 de cada 4 són per impagament del
+        lloguer</strong>. Estes xifres no inclouen la gent que se'n va abans
+        del llançament: són el sòl del problema, no el sostre.</p>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafDesnonaments" role="img" aria-label="Gràfic de barres apilades: desnonaments executats per any a la província de Castelló, per causa: lloguer, execució hipotecària i altres"></canvas>
+        </div>
+        <figcaption>Llançaments practicats per any i causa, província de
+          Castelló. Font: CGPJ, «Efecte de la crisi en els òrgans judicials».</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= VIVENDA TURÍSTICA ================= -->
+  <section id="turistica" aria-labelledby="titolTuristica">
+    <div class="contenidor">
+      <h2 id="titolTuristica">Vivenda turística: cases sense veïns</h2>
+      <p class="entradeta">Cada pis convertit en allotjament turístic és un pis
+        menys per a viure. A la província, la costa concentra milers de
+        vivendes turístiques registrades; a la ciutat, l'INE estima les que
+        realment s'oferixen a les plataformes.</p>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafVT" role="img" aria-label="Gràfic de línies: vivendes turístiques estimades per l'INE a Castelló ciutat per semestres"></canvas>
+        </div>
+        <figcaption>Vivendes turístiques a Castelló ciutat estimades per l'INE
+          (anuncis en plataformes, semestral). El registre oficial de la GVA i
+          l'estimació de l'INE mesuren coses diferents; les dues apareixen a la
+          taula. Fonts: INE i Turisme GVA.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= MAPA (fase 4) ================= -->
+  <section id="mapa" aria-labelledby="titolMapa">
+    <div class="contenidor">
+      <h2 id="titolMapa">El mapa de la desigualtat</h2>
+      <p class="entradeta">Renda mitjana i lloguer per secció censal de
+        Castelló ciutat: la diferència de renda entre barris arriba a ser de
+        més de 15.000 € per persona i any. <em>(Mapa interactiu disponible
+        pròximament.)</em></p>
+    </div>
+  </section>
+
+  <!-- ================= DADES CLAU (SEO/AEO) ================= -->
+  <section id="dades-clau" aria-labelledby="titolDades">
+    <div class="contenidor">
+      <h2 id="titolDades">Dades clau, en text pla</h2>
+      <p class="entradeta">Les mateixes xifres dels gràfics, en text, amb any i
+        font, per a poder citar-les (i perquè els buscadors les troben).</p>
+      <ul>
+        <li>El <strong>lloguer mitjà real</strong> (mediana de contractes declarats) a
+          Castelló de la Plana el 2024 era de <strong>500 €/mes</strong> i
+          5,43 €/m²/mes, un <strong>59% més per m² que el 2015</strong>
+          (font: SERPAVI, MIVAU).</li>
+        <li>El <strong>salari mitjà brut</strong> de la província de Castelló el 2024 era de
+          <strong>23.117 € anuals</strong> (font: AEAT, Mercat de Treball en les
+          Fonts Tributàries).</li>
+        <li>La <strong>taxa d'esforç</strong> mitjana (lloguer sobre salari net estimat) el
+          2024 era del <strong>32,9%</strong>, per damunt del llindar de
+          sobrecàrrega del 30% (elaboració pròpia, SERPAVI + AEAT).</li>
+        <li>Entre 2013 i 2025 s'han executat <strong>10.873 desnonaments</strong> a la
+          província de Castelló; el 2025, el <strong>74% van ser per impagament de
+          lloguer</strong> (font: CGPJ).</li>
+        <li>El <strong>preu taxat</strong> de la vivenda lliure a Castelló ciutat el 2025 era
+          de <strong>1.339 €/m²</strong> de mitjana anual (font: MIVAU).</li>
+        <li>La <strong>renda neta mitjana</strong> a Castelló ciutat era de
+          <strong>14.696 € per persona</strong> el 2023, amb barris entre 9.276 € i
+          24.777 € (font: INE, Atles de Distribució de Renda de les Llars).</li>
+        <li>El 2025 es van firmar <strong>2.439 contractes nous de lloguer</strong> a la
+          ciutat (fiances dipositades, GVA), un 54% més que el 2020.</li>
+        <li>A Castelló ciutat hi havia <strong>634 vivendes turístiques registrades</strong>
+          (GVA, juliol 2026) i l'INE n'estimava <strong>393 en plataformes</strong>
+          (maig 2026), l'equivalent al 0,43% del parc.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= METODOLOGIA ================= -->
+  <section id="metodologia" aria-labelledby="titolMetodologia">
+    <div class="contenidor">
+      <h2 id="titolMetodologia">Metodologia i fonts</h2>
+      <p class="entradeta">Última actualització de les dades:
+        <strong id="dataActualitzacio">–</strong>. Tot el que publica esta
+        pàgina és reproduïble: les fonts són públiques i els scripts de
+        descàrrega i càlcul, auditables.</p>
+
+      <h3>Què mesura (i què no) cada font</h3>
+      <ul>
+        <li><strong>SERPAVI</strong> (MIVAU) explota les declaracions fiscals
+          d'arrendament: és la millor dada de lloguer <em>real</em>, però arriba
+          amb un desfasament d'un any i mig llarg. Els preus d'anuncis de portals
+          són d'<em>oferta</em> i sobreestimen el mercat.</li>
+        <li>El <strong>salari mitjà de l'AEAT</strong> promedia totes les relacions
+          laborals de l'any sense ajustar per jornada o temps treballat:
+          <em>infravalora</em> el salari a temps complet. El fem servir perquè és
+          censal i provincial.</li>
+        <li>La <strong>taxa d'esforç</strong> es calcula amb el salari net estimat:
+          brut AEAT × 0,79 (descompte aproximat de cotitzacions i IRPF mitjà),
+          en 12 pagues.</li>
+        <li>Els <strong>llançaments del CGPJ</strong> són desnonaments executats amb
+          intervenció judicial: no inclouen abandonaments forçats sense
+          procediment.</li>
+        <li>L'<strong>estimació de vivenda turística de l'INE</strong> (anuncis en
+          plataformes, amb deduplicació) i el <strong>registre oficial de la
+          GVA</strong> mesuren coses diferents; la diferència entre les dues és
+          informativa per si mateixa.</li>
+        <li>La <strong>renda de l'ADRH</strong> (INE) arriba amb ~2 anys de
+          desfasament: sempre indiquem l'any de la dada.</li>
+      </ul>
+
+      <h3>Fonts i actualitat de cada dada</h3>
+      <table aria-describedby="titolMetodologia">
+        <thead><tr><th>Font</th><th>Última dada</th><th>Descarregat</th></tr></thead>
+        <tbody id="taulaFonts"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section id="cta" aria-labelledby="titolCta">
+    <div class="contenidor">
+      <h2 id="titolCta">Les dades ja les tens. Ara, organitza't</h2>
+      <p>Si estes xifres et sonen a la teua vida, no és mala sort: és un model
+        de ciutat. I només es canvia col·lectivament.</p>
+      <a class="boto" href="https://cgtcastello.org" rel="noopener">CGT Castelló</a>
+      <a class="boto" href="https://cgtcastello.org/afiliat" rel="noopener">Afilia't</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="peu">
+  <div class="contenidor">
+    <p>Observatori de l'Habitatge de Castelló — CGT Castelló. Dades de fonts
+      públiques oficials (MIVAU, INE, AEAT, CGPJ, GVA), citades amb any i
+      enllaç a la <a href="#metodologia">metodologia</a>. Contingut reutilitzable
+      citant la font.</p>
+  </div>
+</footer>
+
+<script src="data/data.js"></script>
+<script src="vendor/chart.umd.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
