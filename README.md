@@ -13,7 +13,14 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/fetch_cgpj.py      # desahucios (lanzamientos CGPJ)
 .venv/bin/python scripts/fetch_vt.py        # vivienda turística (GVA + INE)
 .venv/bin/python scripts/fetch_aeat.py      # salarios y renta IRPF municipal
+.venv/bin/python scripts/fetch_mivau.py     # valor tasado €/m² (precio compra)
+.venv/bin/python scripts/fetch_fianzas.py   # fianzas GVA (contratos de alquiler/año)
+.venv/bin/python scripts/build_all.py       # indicadores derivados + meta.json
 ```
+
+`build_all.py --fetch` ejecuta antes todos los fetchers. Cada indicador tiene
+un test de rango plausible (dict `RANGOS`): si un valor se sale, el build
+aborta sin publicar nada.
 
 `scripts/manual_inputs.csv` guarda los datos introducidos a mano (SMI, precios
 de oferta de portales) con fuente y URL por fila.
@@ -31,6 +38,6 @@ actualizarla.
 
 - [x] Fase 1a: `fetch_serpavi.py`, `fetch_ine.py`
 - [x] Fase 1b: `fetch_cgpj.py`, `fetch_vt.py`, `fetch_aeat.py`, `manual_inputs.csv`
-- [ ] Fase 2: indicadores derivados en `build_all.py` + `data/meta.json`
+- [x] Fase 2: indicadores derivados en `build_all.py` + `data/meta.json`
 - [ ] Fase 3: web one-page en valenciano (Chart.js + calculadora)
 - [ ] Fase 4: mapa Leaflet, versión /es/, SEO (JSON-LD, hreflang, sitemap)
