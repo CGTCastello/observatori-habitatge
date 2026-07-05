@@ -37,6 +37,9 @@ RANGOS = {
     "vt_castello_ine": (50, 5000),
     "fianzas_ultimo": (1000, 30000),
     "esfuerzo_1smi_pct": (25, 70),           # alquiler mediano sobre neto de 1 SMI
+    "subida_absorbida_pct": (10, 90),        # % de la subida salarial comida por el alquiler
+    "esfuerzo_pensionista_pct": (15, 70),
+    "anyos_ahorro_entrada_smi": (2, 40),
 }
 
 # Parámetros IRPF/SS 2024 para el neto por niveles salariales (indicador
@@ -55,11 +58,12 @@ IRPF_2024 = {
 }
 
 
-def neto_anual_2024(bruto):
+def neto_anual_2024(bruto, cotiza_ss=True):
     """Neto anual estimado con los parámetros IRPF_2024. Aproximación
-    documentada en la metodología; no sustituye a una nómina real."""
+    documentada en la metodología; no sustituye a una nómina real.
+    cotiza_ss=False para pensiones (no cotizan a la Seguridad Social)."""
     p = IRPF_2024
-    ss = bruto * p["ss_pct"]
+    ss = bruto * p["ss_pct"] if cotiza_ss else 0.0
     rn = bruto - ss - p["gastos"]
     reduccion = 0.0
     if rn <= p["reduccion"][0][0]:
@@ -215,6 +219,104 @@ def esfuerzo_niveles(alq_muni, salarios, smi):
     }
 
 
+def subida_absorbida(alq_muni, salarios):
+    """¿Qué parte de la subida salarial desde 2015 se ha comido el alquiler?"""
+    ult = max(y for y in alq_muni if "vc" in alq_muni[y]
+              and y in salarios["serie"])
+    d_alq = (alq_muni[ult]["vc"]["eur_mes"]["mediana"]
+             - alq_muni[BASE]["vc"]["eur_mes"]["mediana"])
+    d_bruto_mes = (salarios["serie"][ult]["salario_medio_eur"]
+                   - salarios["serie"][BASE]["salario_medio_eur"]) / 12
+    d_neto_mes = d_bruto_mes * (1 - RETENCION_MEDIA)
+    pct_neto = rnd(100 * d_alq / d_neto_mes, 0)
+    check("subida_absorbida_pct", pct_neto)
+    return {
+        "periodo": f"{BASE}-{ult}",
+        "subida_alquiler_mes": rnd(d_alq, 0),
+        "subida_salario_bruto_mes": rnd(d_bruto_mes, 0),
+        "subida_salario_neto_mes": rnd(d_neto_mes, 0),
+        "pct_absorbido_bruto": rnd(100 * d_alq / d_bruto_mes, 0),
+        "pct_absorbido_neto": pct_neto,
+        "nota": "Comparación de la subida del alquiler mediano mensual con la "
+                "subida del salario medio mensual (12 pagas) en el mismo "
+                "periodo. Neto con el mismo factor que la tasa de esfuerzo.",
+    }
+
+
+def comparativa_provincias(alquiler):
+    comp = alquiler.get("comparativa_provincias")
+    if not comp or len(comp) != 3:
+        die("comparativa_provincias ausente en alquiler_serpavi.json")
+    out = {}
+    for cod, d in comp.items():
+        s = d["eur_m2_mediana_vc"]
+        if BASE not in s:
+            die(f"comparativa: {d['nombre']} sin año base")
+        out[cod] = {"nombre": d["nombre"],
+                    "indice": {y: rnd(100 * v / s[BASE], 1)
+                               for y, v in sorted(s.items()) if y >= BASE},
+                    "eur_m2": {y: v for y, v in sorted(s.items()) if y >= BASE}}
+    return {"base": BASE, "provincias": out}
+
+
+def esfuerzo_colectivos(alq_muni, desglose, pensiones):
+    """Tasa de esfuerzo del alquiler mediano por colectivos (edad, sexo,
+    sector y pensionistas), con el neto del modelo IRPF 2024."""
+    anyo = desglose["anyo"]
+    if anyo not in alq_muni:
+        die(f"esfuerzo_colectivos: sin alquiler de {anyo}")
+    mediana = alq_muni[anyo]["vc"]["eur_mes"]["mediana"]
+
+    def item(bruto, n, cotiza_ss=True):
+        neto_mes = neto_anual_2024(bruto, cotiza_ss) / 12
+        return {"bruto_anual": rnd(bruto, 0), "neto_mes_estimado": rnd(neto_mes, 0),
+                "tasa_alquiler_mediano_pct": rnd(100 * mediana / neto_mes, 1),
+                "personas": n}
+
+    out = {"anyo": anyo, "alquiler_mediano_mes": mediana,
+           "edad": {}, "sexo": {}, "sectores": {}, "pensionistas": {}}
+    for k, v in desglose["edad"].items():
+        out["edad"][k] = item(v["salario_medio_eur"], v["asalariados"])
+    for k, v in desglose["sexo"].items():
+        out["sexo"][k] = item(v["salario_medio_eur"], v["asalariados"])
+    for k, v in sorted(desglose["sectores"].items(),
+                       key=lambda kv: -kv[1]["asalariados"])[:6]:
+        out["sectores"][k] = item(v["salario_medio_eur"], v["asalariados"])
+    for k in ("total", "varon", "mujer"):
+        p = pensiones[k]
+        out["pensionistas"][k] = item(p["pension_media_anual_eur"],
+                                      p["pensionistas"], cotiza_ss=False)
+    check("esfuerzo_pensionista_pct",
+          out["pensionistas"]["total"]["tasa_alquiler_mediano_pct"])
+    out["nota"] = ("Salarios medios AEAT sin ajuste por jornada ni tiempo "
+                   "trabajado: en colectivos con mucha parcialidad (jóvenes, "
+                   "hostelería) la tasa refleja lo INGRESADO en el año, no el "
+                   "salario por hora. Pensiones sin cotización a la SS.")
+    return out
+
+
+def ahorro_entrada(precio, salarios, smi):
+    """Años para ahorrar la entrada (20% + 10% de gastos) de una vivienda de
+    90 m² guardando el 15% del neto."""
+    ult_p = ultimo(precio["municipio"]["anual"])
+    coste = precio["municipio"]["anual"][ult_p] * SUPERFICIE_TIPO * 0.30
+    ult_s = ultimo(salarios["serie"])
+    niveles = {}
+    for nombre, bruto in [("1 SMI", smi[ult_s] * 14),
+                          ("salario medio", salarios["serie"][ult_s]["salario_medio_eur"])]:
+        ahorro_anual = neto_anual_2024(bruto) * 0.15
+        niveles[nombre] = rnd(coste / ahorro_anual, 1)
+    check("anyos_ahorro_entrada_smi", niveles["1 SMI"])
+    return {
+        "anyo_precio": ult_p, "anyo_salario": ult_s,
+        "entrada_eur": rnd(coste, 0),
+        "nota": f"Vivienda de {SUPERFICIE_TIPO} m² a valor tasado de la "
+                "ciudad; entrada = 20% no financiado + 10% de gastos e "
+                "impuestos; ahorro del 15% del neto estimado.",
+        "anyos": niveles,
+    }
+
+
 def salario_real(salarios, ipc):
     base_ipc = ipc["anual"][BASE]
     serie = {}
@@ -281,6 +383,49 @@ def mapa_meta(mapa_alq, mapa_renta):
             "secciones_comunes": comunes, "anyo_alquiler": ult_alq}
 
 
+def exporta_municipios(alq_municipios, fuentes):
+    """data/municipios.json: resumen por municipio de la provincia para las
+    fichas de formación (alquiler, fianzas, renta IRPF, VT, parque)."""
+    irpf = fuentes["renta_irpf_municipios"]["municipios"]
+    fian = fuentes["fianzas"]["anual"]
+    vt_gva = fuentes["vivienda_turistica"]["gva"]["municipios"]
+    vt_ine = fuentes["vivienda_turistica"]["ine"]["municipios"]
+    censo = fuentes["censo_viviendas"]["municipios"]
+    out = {}
+    for cod, d in alq_municipios["municipios"].items():
+        anyos = sorted(d["series"])
+        alq = {}
+        for y in (BASE, anyos[-1]):
+            vc = d["series"].get(y, {}).get("vc", {})
+            if "eur_mes" in vc or "eur_m2" in vc:
+                alq[y] = {"eur_mes": vc.get("eur_mes", {}).get("mediana"),
+                          "eur_m2": vc.get("eur_m2", {}).get("mediana"),
+                          "n": vc.get("n")}
+        m = {"nombre": d["nombre"], "alquiler": alq, "ultimo_anyo": anyos[-1]}
+        if cod in fian.get(sorted(fian)[-1], {}).get("municipios", {}):
+            m["fianzas"] = {y: fian[y]["municipios"][cod]
+                            for y in sorted(fian)
+                            if cod in fian[y].get("municipios", {})
+                            and not fian[y]["parcial"]}
+        if cod in irpf:
+            m["renta_irpf"] = irpf[cod]
+        if cod in vt_gva:
+            m["vt_gva"] = {"vt": vt_gva[cod]["vt"], "plazas": vt_gva[cod]["plazas"]}
+        if cod in vt_ine and vt_ine[cod]["series"]:
+            u = sorted(vt_ine[cod]["series"])[-1]
+            m["vt_ine"] = {"periodo": u, **vt_ine[cod]["series"][u]}
+        if cod in censo:
+            m["censo_2021"] = censo[cod]
+        out[cod] = m
+    if len(out) < 10 or "12040" not in out:
+        die(f"municipios.json: solo {len(out)} municipios")
+    write_json("municipios.json", {
+        "nota": "Resumen municipal para las fichas de formación. Fuentes y "
+                "años: los de cada bloque (ver data/meta.json).",
+        "municipios": out,
+    })
+
+
 def ultimo_dato(clave, datos):
     """Fecha del último dato de cada fuente, para data/meta.json."""
     try:
@@ -307,6 +452,10 @@ def ultimo_dato(clave, datos):
             return ultimo(datos["municipio"]["trimestral"])
         if clave == "fianzas":
             return ultimo(datos["anual"])
+        if clave in ("salarios_desglose", "pensiones", "censo_viviendas"):
+            return datos["anyo"]
+        if clave == "irav":
+            return datos["ultimo"]["periodo"]
     except (KeyError, IndexError) as e:
         die(f"meta: no puedo determinar el último dato de {clave}: {e!r}")
 
@@ -322,7 +471,9 @@ def main():
     fuentes = {n: carga(f"{n}.json") for n in [
         "alquiler_serpavi", "ipc", "compraventas", "hipotecas", "ipv",
         "renta_adrh", "desahucios", "vivienda_turistica", "salarios_aeat",
-        "renta_irpf_municipios", "precio_vivienda", "fianzas"]}
+        "renta_irpf_municipios", "precio_vivienda", "fianzas",
+        "salarios_desglose", "pensiones", "censo_viviendas", "irav"]}
+    alq_municipios = carga("alquiler_municipios.json")
     mapa_alq = carga("mapa_alquiler.json")
     mapa_renta = carga("mapa_renta.json")
     smi = carga_manual()
@@ -342,8 +493,19 @@ def main():
         "fianzas": fianzas_ind(fuentes["fianzas"]),
         "mapa": mapa_meta(mapa_alq, mapa_renta),
         "smi_mensual": smi,
+        "subida_absorbida": subida_absorbida(alq_muni, fuentes["salarios_aeat"]),
+        "comparativa_provincias": comparativa_provincias(fuentes["alquiler_serpavi"]),
+        "esfuerzo_colectivos": esfuerzo_colectivos(
+            alq_muni, fuentes["salarios_desglose"], fuentes["pensiones"]),
+        "ahorro_entrada": ahorro_entrada(fuentes["precio_vivienda"],
+                                         fuentes["salarios_aeat"], smi),
+        "censo": {"anyo": "2021",
+                  "castello": {**fuentes["censo_viviendas"]["municipios"]["12040"],
+                               "tenencia": fuentes["censo_viviendas"]["tenencia_castello"]}},
+        "irav": fuentes["irav"]["ultimo"],
     }
     write_json("indicadores.json", indicadores)
+    exporta_municipios(alq_municipios, fuentes)
 
     meta = {
         "generado": datetime.datetime.now().isoformat(timespec="seconds"),
@@ -362,7 +524,8 @@ def main():
 # como fallback para abrir index.html con file://)
 FICHEROS_WEB = ["indicadores.json", "meta.json", "alquiler_serpavi.json",
                 "salarios_aeat.json", "precio_vivienda.json", "hipotecas.json",
-                "mapa_alquiler.json", "mapa_renta.json", "secciones.geojson"]
+                "mapa_alquiler.json", "mapa_renta.json", "secciones.geojson",
+                "irav.json", "censo_viviendas.json"]
 
 
 def export_web():

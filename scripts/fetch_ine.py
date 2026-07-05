@@ -25,6 +25,7 @@ T_HIPO = 76317       # Hipotecas por naturaleza de finca, nº e importe (prov.)
 T_IPV_2015 = 76201   # IPV trimestral por CCAA, base 2015
 T_IPV_NUEVA = 79540  # IPV trimestral por CCAA, base nueva
 T_ADRH = 30962       # ADRH provincia de Castellón (municipios/distritos/secciones)
+T_IRAV = 72975       # Índice de Referencia de Arrendamientos de Vivienda (nacional)
 
 
 def norm(s):
@@ -273,12 +274,35 @@ def fetch_adrh():
         f"{len(secciones)} secciones, {len(distritos)} distritos")
 
 
+def fetch_irav():
+    """IRAV: tope legal de actualización anual de alquileres (Ley 12/2023).
+    Nacional, mensual desde enero de 2025."""
+    series = datos_tabla(T_IRAV, nult=60)
+    s = pick_one(series, "indice general", "variacion anual")
+    mens = mensual(datos(s))
+    ult = sorted(mens)[-1]
+    if not (-2 <= mens[ult] <= 10):
+        die(f"IRAV implausible en {ult}: {mens[ult]}")
+    write_json("irav.json", {
+        "fuente": fuente_ine(T_IRAV, "Índice de Referencia de Arrendamientos "
+                                     "de Vivienda (IRAV)"),
+        "serie": s["COD"],
+        "nota": "Variación anual máxima aplicable a la actualización de rentas "
+                "de contratos posteriores al 25/05/2023 (Ley 12/2023). "
+                "Nacional, mensual.",
+        "mensual": mens,
+        "ultimo": {"periodo": ult, "pct": mens[ult]},
+    })
+    log(f"IRAV: último {ult} = {mens[ult]}%")
+
+
 def main():
     fetch_ipc()
     fetch_compraventas()
     fetch_hipotecas()
     fetch_ipv()
     fetch_adrh()
+    fetch_irav()
     log("fetch_ine: todo OK")
 
 

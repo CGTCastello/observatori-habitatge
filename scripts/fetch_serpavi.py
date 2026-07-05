@@ -106,17 +106,38 @@ def main():
     if not need.issubset(set(wb.sheet_names)):
         die(f"faltan hojas {need - set(wb.sheet_names)} en el XLSX; hojas: {wb.sheet_names}")
 
-    # --- Provincia 12 ---
+    # --- Provincia 12 + comparativa (València 46, Alacant 03) ---
     rows = wb.get_sheet_by_name("Provincias").to_python(skip_empty_area=False)
     prov = extract(rows, 0, lambda c: c == CPRO_CASTELLO, name_col=1)
     if len(prov) != 1:
         die(f"esperaba 1 fila de provincia 12, hay {len(prov)}")
+    comparativa = {}
+    for cod, _, series in extract(rows, 0, lambda c: c in ("03", "12", "46"),
+                                  name_col=1):
+        nombre = next(n for c, n, _ in
+                      extract(rows, 0, lambda x: x == cod, name_col=1))
+        comparativa[cod] = {
+            "nombre": nombre,
+            "eur_m2_mediana_vc": {y: v["vc"]["eur_m2"]["mediana"]
+                                  for y, v in series.items() if "vc" in v},
+        }
+    if len(comparativa) != 3:
+        die(f"comparativa: esperaba 3 provincias, hay {len(comparativa)}")
 
-    # --- Municipio 12040 ---
+    # --- Municipios de la provincia (todos los que tienen datos) ---
     rows = wb.get_sheet_by_name("Municipios").to_python(skip_empty_area=False)
     muni = extract(rows, 2, lambda c: c == CUMUN_CASTELLO, name_col=3)
     if len(muni) != 1:
         die(f"esperaba 1 fila del municipio {CUMUN_CASTELLO}, hay {len(muni)}")
+    municipios = {}
+    for cod, nombre, series in extract(rows, 2,
+                                       lambda c: c.startswith(CPRO_CASTELLO),
+                                       name_col=3):
+        con_datos = {y: v for y, v in series.items() if "vc" in v}
+        if con_datos:
+            municipios[cod] = {"nombre": nombre, "series": con_datos}
+    if len(municipios) < 10 or CUMUN_CASTELLO not in municipios:
+        die(f"municipios provinciales con datos: {len(municipios)}; ¿formato?")
 
     # --- Secciones censales de la ciudad ---
     rows = wb.get_sheet_by_name("Secciones censales").to_python(skip_empty_area=False)
@@ -150,6 +171,13 @@ def main():
         "anyos": years_with_data,
         "provincia": {"codigo": prov[0][0], "nombre": prov[0][1], "series": prov[0][2]},
         "municipio": {"codigo": muni[0][0], "nombre": muni[0][1], "series": muni[0][2]},
+        "comparativa_provincias": comparativa,
+    })
+    write_json("alquiler_municipios.json", {
+        "fuente": src,
+        "nota": "Municipios de la provincia de Castellón con datos SERPAVI "
+                "(vivienda colectiva).",
+        "municipios": municipios,
     })
 
     # Mapa: solo VC €/m² y n por sección y año (compacto para la web)

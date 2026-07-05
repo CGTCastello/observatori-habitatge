@@ -39,30 +39,38 @@ def parse_anyo(anyo, url):
     if r.status_code != 200:
         die(f"HTTP {r.status_code} en {url}")
     rd = csv.DictReader(io.StringIO(r.content.decode("utf-8-sig")), delimiter=";")
-    need = {"cod_provincia", "cod_municipio", "importe_fianza", "devuelta"}
+    need = {"cod_provincia", "cod_municipio", "municipio", "importe_fianza",
+            "devuelta"}
     if not need.issubset(set(rd.fieldnames or [])):
         die(f"fianzas {anyo}: columnas cambiadas: {rd.fieldnames}")
     prov = {"n": 0, "devueltas": 0}
-    muni = {"n": 0, "devueltas": 0, "importes": []}
+    por_muni = {}
     for row in rd:
         if row["cod_provincia"].strip().zfill(2) != "12":
             continue
         dev = row["devuelta"].strip().upper() in ("SI", "SÍ", "S")
         prov["n"] += 1
         prov["devueltas"] += dev
-        if row["cod_municipio"].strip().zfill(3) == "040":
-            muni["n"] += 1
-            muni["devueltas"] += dev
-            try:
-                muni["importes"].append(float(row["importe_fianza"].replace(",", ".")))
-            except (ValueError, AttributeError):
-                pass
-    importe_medio = (rnd(sum(muni["importes"]) / len(muni["importes"]), 0)
-                     if muni["importes"] else None)
+        cod = "12" + row["cod_municipio"].strip().zfill(3)
+        m = por_muni.setdefault(cod, {"nombre": row["municipio"].strip().title(),
+                                      "n": 0, "importes": []})
+        m["n"] += 1
+        try:
+            m["importes"].append(float(row["importe_fianza"].replace(",", ".")))
+        except (ValueError, AttributeError):
+            pass
+    if "12040" not in por_muni:
+        die(f"fianzas {anyo}: falta Castelló ciudad")
+    municipios = {cod: {"nombre": m["nombre"], "fianzas": m["n"],
+                        "importe_medio_eur": (rnd(sum(m["importes"]) / len(m["importes"]), 0)
+                                              if m["importes"] else None)}
+                  for cod, m in por_muni.items()}
+    cas = municipios["12040"]
     return {
         "provincia": {"fianzas": prov["n"], "devueltas": prov["devueltas"]},
-        "municipio": {"fianzas": muni["n"], "devueltas": muni["devueltas"],
-                      "importe_medio_eur": importe_medio},
+        "municipio": {"fianzas": cas["fianzas"],
+                      "importe_medio_eur": cas["importe_medio_eur"]},
+        "municipios": municipios,
     }
 
 

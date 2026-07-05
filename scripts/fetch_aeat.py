@@ -47,7 +47,12 @@ def get(url):
     r = requests.get(url, headers={"User-Agent": UA}, timeout=120)
     if r.status_code != 200:
         return None
-    return r.text
+    # las ediciones modernas son UTF-8 sin charset en la cabecera; las
+    # antiguas, latin-1: decodificar a mano para no heredar mojibake
+    try:
+        return r.content.decode("utf-8")
+    except UnicodeDecodeError:
+        return r.content.decode("latin-1")
 
 
 def links(html):
@@ -150,6 +155,86 @@ def fetch_tramos(anyo):
             "etiquetas": "límites en múltiplos del SMI del año de referencia"}
 
 
+FILA_NOMBRE_RE = re.compile(
+    r"<th[^>]*>\s*<div[^>]*>([^<]+)</div>\s*</th>(.*?)</tr>", re.S)
+
+
+def menu_items(html, menu):
+    """Elementos del desplegable `menu` de una página jrubik: pares
+    (href, texto) del bloque <ul aria-label="menu" role="menu">."""
+    bloque = re.search(
+        r'<ul[^>]*aria-label="' + re.escape(menu) + r'"[^>]*role="menu"(.*?)</ul>',
+        html, re.S)
+    if not bloque:
+        return []
+    return [(m.group(1), m.group(2).strip()) for m in
+            re.finditer(r'href="([^"#]+)"[^>]*role="menuitem"[^>]*>([^<]+)',
+                        bloque.group(1))]
+
+
+def filas_tabla(html):
+    """Todas las filas (nombre, [valores]) de una tabla jrubik."""
+    return [(m.group(1).strip(), [num_es(c) for c in CELL_RE.findall(m.group(2))])
+            for m in FILA_NOMBRE_RE.finditer(html)]
+
+
+def fetch_desglose(anyo):
+    """Asalariados y salario medio de Castellón por edad, sexo y sector."""
+    out = {"anyo": str(anyo), "edad": {}, "sexo": {}, "sectores": {}}
+
+    url, url_base = tabla_de_anyo(anyo, "por provincia, edad y sexo")
+    if url is None:
+        die(f"desglose: no encuentro la tabla de edad de {anyo}")
+    html = get(url)
+    for menu, clave in [("Tramos de Edad", "edad"), ("Sexo", "sexo")]:
+        for href, texto in menu_items(html, menu):
+            if norm(texto) == "total":
+                continue
+            vals = fila_castellon(get(f"{url_base}/{href}") or "")
+            if not vals or vals[0] is None or vals[3] is None:
+                log(f"aviso: sin dato de {texto!r}")
+                continue
+            out[clave][texto] = {"asalariados": int(vals[0]),
+                                 "salario_medio_eur": rnd(vals[3], 0)}
+
+    url, url_base = tabla_de_anyo(anyo, "sector de actividad (nace), provincia")
+    if url is None:
+        die(f"desglose: no encuentro la tabla de sectores de {anyo}")
+    html_sect = get(url)
+    href_cast = next((h for menu in ("Comunitat Valenciana", "Provincia")
+                      for h, t in menu_items(html_sect, menu)
+                      if norm(t).startswith("castell")), None)
+    if href_cast is None:
+        die("desglose: Castellón no está en el menú de provincias")
+    for nombre, vals in filas_tabla(get(f"{url_base}/{href_cast}")):
+        if len(vals) >= 4 and vals[0] and vals[3] and norm(nombre) != "total":
+            out["sectores"][nombre] = {"asalariados": int(vals[0]),
+                                       "salario_medio_eur": rnd(vals[3], 0)}
+    if len(out["edad"]) < 5 or len(out["sexo"]) != 2 or len(out["sectores"]) < 8:
+        die(f"desglose incompleto: {len(out['edad'])} edades, "
+            f"{len(out['sexo'])} sexos, {len(out['sectores'])} sectores")
+    return out
+
+
+def fetch_pensiones(anyo):
+    """Pensionistas y pensión media anual de la provincia (total/varón/mujer)."""
+    url, _ = tabla_de_anyo(anyo, "pensiones medias por sexo, provincia del "
+                                 "perceptor y edad")
+    if url is None:
+        die(f"pensiones: no encuentro la tabla de {anyo}")
+    vals = fila_castellon(get(url) or "")
+    # 3 bloques (Total/Varón/Mujer) × (pensionistas, pensiones/perceptor, media)
+    if not vals or len(vals) < 9:
+        die(f"pensiones: fila inesperada {vals}")
+    bloques = {}
+    for i, sexo in enumerate(["total", "varon", "mujer"]):
+        n, media = vals[i * 3], vals[i * 3 + 2]
+        if n is None or media is None or not (5000 <= media <= 40000):
+            die(f"pensiones {sexo}: valores implausibles {n}, {media}")
+        bloques[sexo] = {"pensionistas": int(n), "pension_media_anual_eur": rnd(media, 0)}
+    return {"anyo": str(anyo), **bloques}
+
+
 CATALOGO_IRPF = ("https://sede.agenciatributaria.gob.es/Sede/datosabiertos/"
                  "catalogo/hacienda/Estadistica_de_los_declarantes_del_IRPF_"
                  "por_municipios.shtml")
@@ -209,6 +294,31 @@ def main():
     serie = fetch_serie_salarios()
     ult = sorted(serie)[-1]
     tramos = fetch_tramos(int(ult))
+    desglose = fetch_desglose(int(ult))
+    write_json("salarios_desglose.json", {
+        "fuente": fuente(
+            "AEAT — Mercado de Trabajo y Pensiones en las Fuentes Tributarias",
+            CATALOGO,
+            nota="Asalariados y salario medio anual bruto de la provincia de "
+                 "Castellón por tramo de edad, sexo y sector NACE. Sin ajuste "
+                 "por jornada ni tiempo trabajado.",
+        ),
+        **desglose,
+    })
+    log(f"desglose {ult}: {len(desglose['edad'])} edades, "
+        f"{len(desglose['sectores'])} sectores")
+    pensiones = fetch_pensiones(int(ult))
+    write_json("pensiones.json", {
+        "fuente": fuente(
+            "AEAT — Mercado de Trabajo y Pensiones en las Fuentes Tributarias",
+            CATALOGO,
+            nota="Pensionistas y pensión media anual (todas las pensiones "
+                 "percibidas) de la provincia de Castellón.",
+        ),
+        **pensiones,
+    })
+    log(f"pensiones {ult}: media {pensiones['total']['pension_media_anual_eur']} € "
+        f"({pensiones['total']['pensionistas']} pensionistas)")
     anyo_irpf, munis_irpf = fetch_renta_municipal()
     write_json("renta_irpf_municipios.json", {
         "fuente": fuente(
