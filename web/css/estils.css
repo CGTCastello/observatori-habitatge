@@ -95,6 +95,13 @@ section:nth-of-type(even) figure.grafic .marc { background: var(--fons); }
 figure.grafic figcaption {
   font-size: .8rem; color: var(--gris); margin-top: .4rem;
 }
+button.descarrega {
+  font-size: .72rem; padding: .1rem .5rem; cursor: pointer;
+  border: 1px solid var(--gris); background: transparent; color: var(--gris);
+  border-radius: 3px; vertical-align: 1px;
+}
+button.descarrega:hover { border-color: var(--roig); color: var(--roig-fosc); }
+
 details.taula { margin-top: .4rem; font-size: .85rem; }
 details.taula summary { cursor: pointer; color: var(--gris); }
 details.taula table { border-collapse: collapse; margin-top: .5rem; width: 100%; }

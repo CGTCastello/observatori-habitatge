@@ -235,6 +235,14 @@
             <strong>–</strong>
             <span id="resComprarNota"></span>
           </div>
+          <div class="resultat" id="resIrav">
+            <strong>–</strong>
+            <span id="resIravNota"></span>
+          </div>
+          <div class="resultat" id="resEntrada">
+            <strong>–</strong>
+            <span id="resEntradaNota"></span>
+          </div>
         </div>
         <button class="compartir" id="btnCompartir">Compartix el teu resultat</button>
         <p class="calc-nota">Càlcul orientatiu fet al teu navegador: no
@@ -278,6 +286,15 @@
           nous firmats cada any. Font: Registre de fiances, GVA dades obertes.</figcaption>
         <details class="taula"><summary>Vore les dades en taula</summary></details>
       </figure>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafComparativa" role="img" aria-label="Gràfic de línies: evolució del lloguer per metre quadrat des de 2015 a les províncies de Castelló, València i Alacant, en índex base 100"></canvas>
+        </div>
+        <figcaption>La pujada no és cosa només de les grans capitals: evolució
+          del €/m² real (índex 2015 = 100) a les tres províncies. Font: SERPAVI
+          (MIVAU).</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
     </div>
   </section>
 
@@ -306,6 +323,17 @@
         </div>
         <figcaption>Distribució dels assalariats per trams de salari anual, en
           múltiples de l'SMI. Font: AEAT, província de Castelló.</figcaption>
+        <details class="taula"><summary>Vore les dades en taula</summary></details>
+      </figure>
+      <figure class="grafic">
+        <div class="marc">
+          <canvas id="grafColectius" role="img" aria-label="Gràfic de barres horitzontals: percentatge del salari net que costa el lloguer mitjà segons el col·lectiu: edat, sexe, sector i pensionistes"></canvas>
+        </div>
+        <figcaption>Quina part del seu ingrés net mensual costa el lloguer
+          mitjà (500 €) a cada col·lectiu. En roig, els que superen el llindar
+          de sobrecàrrega del 30%. Ingressos anuals AEAT sense ajust per
+          jornada: en col·lectius amb molta parcialitat reflecteix l'ingressat,
+          no el sou per hora. Fonts: AEAT + SERPAVI.</figcaption>
         <details class="taula"><summary>Vore les dades en taula</summary></details>
       </figure>
     </div>
@@ -428,6 +456,23 @@
         <li>A Castelló ciutat hi havia <strong>634 vivendes turístiques registrades</strong>
           (GVA, juliol 2026) i l'INE n'estimava <strong>393 en plataformes</strong>
           (maig 2026), l'equivalent al 0,43% del parc.</li>
+        <li>De cada 100 € de pujada del salari net mitjà entre 2015 i 2024,
+          <strong>el lloguer se n'ha menjat 48</strong> (elaboració pròpia,
+          SERPAVI + AEAT).</li>
+        <li>Per a qui cobra <strong>1 SMI</strong> (com a màxim, el 39% dels
+          assalariats de la província el 2024), el lloguer mitjà suposa el
+          <strong>40,4% del seu ingrés net</strong>; per als
+          <strong>pensionistes</strong>, el 34,8% de la pensió mitjana
+          (elaboració pròpia, AEAT + SERPAVI, 2024).</li>
+        <li>Els assalariats de <strong>18 a 25 anys</strong> de la província van ingressar
+          de mitjana <strong>9.507 € bruts</strong> el 2024; les dones, 19.903 €
+          front als 25.902 € dels homes (AEAT).</li>
+        <li>Estalviant el 15% d'un SMI net, fan falta <strong>16,2 anys</strong>
+          per a reunir l'entrada i les despeses d'una vivenda mitjana de 90 m²
+          a Castelló ciutat (elaboració pròpia, MIVAU 2025).</li>
+        <li>El <strong>23,5% de les vivendes</strong> de Castelló ciutat no són
+          residència principal, i el <strong>14,7% de les llars</strong> viuen de
+          lloguer (INE, Cens 2021).</li>
       </ul>
     </div>
   </section>
@@ -463,6 +508,18 @@
           informativa per si mateixa.</li>
         <li>La <strong>renda de l'ADRH</strong> (INE) arriba amb ~2 anys de
           desfasament: sempre indiquem l'any de la dada.</li>
+        <li>El <strong>net estimat per col·lectius</strong> (gràfic d'esforç per
+          col·lectius i taula d'1/1,5/2 SMI) es calcula amb la cotització del
+          treballador (6,48%), les despeses deduïbles, la reducció per
+          rendiments del treball i l'escala estatal duplicada, amb els
+          paràmetres de 2024: és una aproximació reproduïble, no una nòmina.
+          Les pensions no cotitzen a la Seguretat Social.</li>
+        <li>L'<strong>IRAV</strong> limita la pujada anual dels contractes
+          firmats després del 25/05/2023 (Llei 12/2023); per als anteriors
+          regix el que diga el contracte (normalment IPC).</li>
+        <li>El <strong>Cens 2021</strong> publica tinença i tipus de vivenda a
+          escala municipal; el detall per secció censal només va existir al
+          cens de 2011, per això el mapa no porta eixa capa.</li>
       </ul>
 
       <h3>Fonts i actualitat de cada dada</h3>

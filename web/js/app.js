@@ -146,6 +146,31 @@
         }));
     });
 
+    // 2b. Comparativa provincial (índex 100 del €/m²)
+    grafic("grafComparativa", function (cv) {
+      var comp = ind.comparativa_provincias.provincias;
+      var defs = [["12", ROIG, 3], ["46", NEGRE, 2], ["03", GRIS, 2]];
+      var anys = anysOrdenats(comp["12"].indice);
+      new Chart(cv, {
+        type: "line",
+        data: {
+          labels: anys,
+          datasets: defs.map(function (d) {
+            var p = comp[d[0]];
+            return { label: p.nombre.split("/")[0], data: anys.map(function (a) { return p.indice[a]; }),
+                     borderColor: d[1], backgroundColor: d[1], borderWidth: d[2],
+                     pointRadius: 2 };
+          }),
+        },
+        options: fusiona(),
+      });
+      taulaAccessible(cv.closest("figure"),
+        ["Any"].concat(defs.map(function (d) { return comp[d[0]].nombre.split("/")[0] + " €/m²"; })),
+        anys.map(function (a) {
+          return [a].concat(defs.map(function (d) { return comp[d[0]].eur_m2[a]; }));
+        }));
+    });
+
     // 3. Taxa d'esforç
     grafic("grafEsforc", function (cv) {
       var s = ind.tasa_esfuerzo.serie;
@@ -210,6 +235,45 @@
       taulaAccessible(cv.closest("figure"), ["Tram", "Assalariats", "%"],
         etiquetes.map(function (e) {
           return [e + " SMI", FMT0.format(t.tramos[e]), FMT.format(100 * t.tramos[e] / total)];
+        }));
+    });
+
+    // 5b. Esforç per col·lectius
+    grafic("grafColectius", function (cv) {
+      var ec = ind.esfuerzo_colectivos;
+      var files = [];
+      ["De 18 a 25 años", "De 26 a 35 años"].forEach(function (k) {
+        if (ec.edad[k]) files.push([k.replace("años", "anys").replace("De ", ""), ec.edad[k]]);
+      });
+      Object.keys(ec.sexo).forEach(function (k) {
+        files.push([k === "Varón" ? "Homes" : "Dones", ec.sexo[k]]);
+      });
+      files.push(["Pensionistes", ec.pensionistas.total]);
+      Object.keys(ec.sectores).forEach(function (k) {
+        files.push([k.length > 32 ? k.slice(0, 30) + "…" : k, ec.sectores[k]]);
+      });
+      files.sort(function (a, b) { return b[1].tasa_alquiler_mediano_pct - a[1].tasa_alquiler_mediano_pct; });
+      new Chart(cv, {
+        type: "bar",
+        data: {
+          labels: files.map(function (f) { return f[0]; }),
+          datasets: [{
+            label: "% del net que costa el lloguer mitjà (" + ec.anyo + ")",
+            data: files.map(function (f) { return f[1].tasa_alquiler_mediano_pct; }),
+            backgroundColor: files.map(function (f) {
+              return f[1].tasa_alquiler_mediano_pct >= 30 ? ROIG : NEGRE;
+            }),
+          }],
+        },
+        options: fusiona({ indexAxis: "y",
+          scales: { x: { ticks: { color: GRIS, callback: function (v) { return v + "%"; } } },
+                    y: { ticks: { color: NEGRE, autoSkip: false, font: { size: 10 } } } } }),
+      });
+      taulaAccessible(cv.closest("figure"),
+        ["Col·lectiu", "Ingrés brut anual €", "Net mensual estimat €", "Taxa %"],
+        files.map(function (f) {
+          return [f[0], FMT0.format(f[1].bruto_anual),
+                  FMT0.format(f[1].neto_mes_estimado), f[1].tasa_alquiler_mediano_pct];
         }));
     });
 
@@ -316,6 +380,54 @@
     });
   }
 
+  // ---------- compartibles: PNG dels gràfics i cites amb font ----------
+  function iniciaCompartibles() {
+    document.querySelectorAll("figure.grafic").forEach(function (fig) {
+      var canvas = fig.querySelector("canvas");
+      var cap = fig.querySelector("figcaption");
+      if (!canvas || !cap) return;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "descarrega";
+      b.textContent = "⤓ PNG";
+      b.setAttribute("aria-label", "Descarrega este gràfic com a imatge PNG");
+      b.addEventListener("click", function () {
+        if (pendents[canvas.id]) {          // encara no s'ha dibuixat
+          pendents[canvas.id]();
+          delete pendents[canvas.id];
+        }
+        setTimeout(function () {
+          var chart = Chart.getChart(canvas);
+          if (!chart) return;
+          var a = document.createElement("a");
+          a.href = chart.toBase64Image("image/png", 1);
+          a.download = "observatori-castello-" + canvas.id + ".png";
+          a.click();
+        }, 150);
+      });
+      cap.appendChild(document.createTextNode(" "));
+      cap.appendChild(b);
+    });
+
+    var url = location.href.split("#")[0];
+    document.querySelectorAll("#dades-clau ul li").forEach(function (li) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "descarrega";
+      b.textContent = "Copia la cita";
+      b.addEventListener("click", function () {
+        var text = li.textContent.replace("Copia la cita", "").trim() +
+          " — Observatori de l'Habitatge de Castelló (CGT): " + url;
+        navigator.clipboard.writeText(text).then(function () {
+          b.textContent = "Copiada ✓";
+          setTimeout(function () { b.textContent = "Copia la cita"; }, 2000);
+        });
+      });
+      li.appendChild(document.createTextNode(" "));
+      li.appendChild(b);
+    });
+  }
+
   // ---------- xifres del hero i dades clau ----------
   function iniciaXifres(dades) {
     var ind = dades.indicadores;
@@ -402,6 +514,23 @@
         "de salari íntegre per a una vivenda de " + C.SUPERFICIE_TIPUS_M2 +
         " m² (" + FMT0.format(preu) + " €, valor taxat " + C.ANY_PREU + ")";
 
+      var pujadaMax = l * C.IRAV.pct / 100;
+      $("resIrav").querySelector("strong").textContent =
+        "+" + FMT.format(pujadaMax).replace(".", ",") + " €/mes";
+      $("resIravNota").textContent =
+        "és el màxim legal que et poden pujar el lloguer enguany (IRAV " +
+        C.IRAV.etiqueta + ": " + FMT.format(C.IRAV.pct).replace(".", ",") +
+        "%), si el contracte és posterior al 25/05/2023";
+
+      var entrada = preu * C.ENTRADA_PCT;
+      var anysEntrada = entrada / (s * 12 * C.ESTALVI_PCT);
+      $("resEntrada").querySelector("strong").textContent =
+        FMT.format(anysEntrada).replace(".", ",") + " anys";
+      $("resEntradaNota").textContent =
+        "estalviant el " + Math.round(C.ESTALVI_PCT * 100) +
+        "% del teu sou per a l'entrada i les despeses de compra (" +
+        FMT0.format(entrada) + " €)";
+
       ultimResultat = "Treballe " + FMT.format(dies).replace(".", ",") +
         " dies al mes només per a pagar l'habitatge (el " +
         FMT.format(taxa).replace(".", ",") + "% del meu sou). I tu? " +
@@ -456,6 +585,7 @@
       iniciaXifres(dades);
       iniciaGrafics(dades);
       iniciaMetodologia(dades);
+      iniciaCompartibles();
     }).catch(function (err) {
       console.error("Error carregant dades:", err);
       var avis = document.getElementById("avisError");
