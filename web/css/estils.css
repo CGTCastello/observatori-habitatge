@@ -125,6 +125,10 @@ section:nth-of-type(even) .destacat { background: var(--fons); }
   background: var(--blanc); color: var(--negre); border-radius: 6px;
   padding: 1.2rem; margin-top: 1rem;
 }
+/* variant per a les calculadores dins de seccions clares */
+.calc-caixa.suau { border: 2px solid var(--negre); margin: 2rem 0 1rem; }
+.calc-caixa.suau h3 { margin-top: 0; }
+.calc-caixa.suau h3::before { content: "▸ "; color: var(--roig); }
 .calc-camps { display: grid; gap: 1.2rem; }
 @media (min-width: 700px) { .calc-camps { grid-template-columns: 1fr 1fr 1fr; } }
 .calc-camps label { font-weight: 700; font-size: .9rem; display: block; }

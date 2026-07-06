@@ -454,97 +454,66 @@
     posa("dataActualitzacio", gen);
   }
 
-  // ---------- calculadora ----------
-  function iniciaCalculadora() {
-    var C = window.CONFIG;
-    var $ = function (id) { return document.getElementById(id); };
-    var salari = $("inpSalari"), salariRang = $("inpSalariRang"),
-        lloguer = $("inpLloguer"), anyRef = $("inpAny");
+  // ---------- calculadores (3, una per pregunta) ----------
+  var $ = function (id) { return document.getElementById(id); };
 
-    // opcions del selector d'any
-    Object.keys(C.IPC_ANUAL).sort().forEach(function (a) {
-      var op = document.createElement("option");
-      op.value = a; op.textContent = a;
-      if (a === "2020") op.selected = true;
-      anyRef.appendChild(op);
+  function num(el) { return parseFloat(el.value) || 0; }
+
+  function coma(v, dec) {
+    return (dec === 0 ? FMT0 : FMT).format(v).replace(".", ",");
+  }
+
+  function escolta(camps, calcula) {
+    camps.forEach(function (el) {
+      ["input", "change"].forEach(function (ev) {
+        el.addEventListener(ev, calcula);
+      });
     });
+    calcula();
+  }
 
-    function classifica(el, taxa) {
-      el.classList.remove("ok", "alerta", "perill");
-      el.classList.add(taxa < 30 ? "ok" : taxa < 40 ? "alerta" : "perill");
-    }
-
+  // 1. "Quant se't menja el lloguer?": salari + lloguer
+  function calcLloguer() {
+    var C = window.CONFIG;
+    var salari = $("inpSalari"), rang = $("inpSalariRang"),
+        lloguer = $("inpLloguer");
     var ultimResultat = "";
 
     function calcula() {
-      var s = parseFloat(salari.value) || 0;
-      var l = parseFloat(lloguer.value) || 0;
-      if (salariRang.value !== salari.value) salariRang.value = salari.value;
+      if (rang.value !== salari.value) rang.value = salari.value;
+      var s = num(salari), l = num(lloguer);
       if (s <= 0 || l <= 0) return;
 
       var taxa = 100 * l / s;
       var dies = 30 * l / s;
-      var resEsforc = $("resEsforc");
-      resEsforc.querySelector("strong").textContent =
-        FMT.format(taxa).replace(".", ",") + "%";
-      classifica(resEsforc, taxa);
+      var res = $("resEsforc");
+      res.querySelector("strong").textContent = coma(taxa) + "%";
+      res.classList.remove("ok", "alerta", "perill");
+      res.classList.add(taxa < 30 ? "ok" : taxa < 40 ? "alerta" : "perill");
       $("resEsforcNota").textContent =
         (taxa >= C.TAXA_MITJANA_PCT ? "per damunt" : "per davall") +
-        " de la mitjana local (" + FMT.format(C.TAXA_MITJANA_PCT).replace(".", ",") +
-        "% el " + C.ANY_LLOGUER + ")";
+        " de la mitjana local (" + coma(C.TAXA_MITJANA_PCT) + "% el " +
+        C.ANY_LLOGUER + ")";
 
-      $("resDies").querySelector("strong").textContent =
-        FMT.format(dies).replace(".", ",");
+      $("resDies").querySelector("strong").textContent = coma(dies);
 
-      var any = anyRef.value;
-      var factor = C.IPC_ULTIM.valor / C.IPC_ANUAL[any];
-      var equivalent = s * factor;
-      $("resPoder").querySelector("strong").textContent =
-        FMT0.format(equivalent) + " €";
-      $("resPoderNota").textContent =
-        "hauria de ser el teu sou de hui per a comprar el mateix que amb " +
-        FMT0.format(s) + " € l'any " + any + " (inflació +" +
-        FMT.format(100 * (factor - 1)).replace(".", ",") + "%)";
-
-      var preu = C.PREU_M2_TAXAT * C.SUPERFICIE_TIPUS_M2;
-      var anysComprar = preu / (s * 12);
-      $("resComprar").querySelector("strong").textContent =
-        FMT.format(anysComprar).replace(".", ",") + " anys";
-      $("resComprarNota").textContent =
-        "de salari íntegre per a una vivenda de " + C.SUPERFICIE_TIPUS_M2 +
-        " m² (" + FMT0.format(preu) + " €, valor taxat " + C.ANY_PREU + ")";
-
-      var pujadaMax = l * C.IRAV.pct / 100;
       $("resIrav").querySelector("strong").textContent =
-        "+" + FMT.format(pujadaMax).replace(".", ",") + " €/mes";
+        "+" + coma(l * C.IRAV.pct / 100) + " €/mes";
       $("resIravNota").textContent =
         "és el màxim legal que et poden pujar el lloguer enguany (IRAV " +
-        C.IRAV.etiqueta + ": " + FMT.format(C.IRAV.pct).replace(".", ",") +
+        C.IRAV.etiqueta + ": " + coma(C.IRAV.pct) +
         "%), si el contracte és posterior al 25/05/2023";
 
-      var entrada = preu * C.ENTRADA_PCT;
-      var anysEntrada = entrada / (s * 12 * C.ESTALVI_PCT);
-      $("resEntrada").querySelector("strong").textContent =
-        FMT.format(anysEntrada).replace(".", ",") + " anys";
-      $("resEntradaNota").textContent =
-        "estalviant el " + Math.round(C.ESTALVI_PCT * 100) +
-        "% del teu sou per a l'entrada i les despeses de compra (" +
-        FMT0.format(entrada) + " €)";
-
-      ultimResultat = "Treballe " + FMT.format(dies).replace(".", ",") +
-        " dies al mes només per a pagar l'habitatge (el " +
-        FMT.format(taxa).replace(".", ",") + "% del meu sou). I tu? " +
-        "Calcula-ho a l'Observatori de l'Habitatge de Castelló:";
+      ultimResultat = "Treballe " + coma(dies) +
+        " dies al mes només per a pagar l'habitatge (el " + coma(taxa) +
+        "% del meu sou). I tu? Calcula-ho a l'Observatori de l'Habitatge " +
+        "de Castelló:";
     }
 
-    ["input", "change"].forEach(function (ev) {
-      salari.addEventListener(ev, calcula);
-      lloguer.addEventListener(ev, calcula);
-      anyRef.addEventListener(ev, calcula);
-      salariRang.addEventListener(ev, function () {
-        salari.value = salariRang.value; calcula();
-      });
+    rang.addEventListener("input", function () {
+      salari.value = rang.value; calcula();
     });
+    escolta([salari, lloguer], calcula);
 
     $("btnCompartir").addEventListener("click", function () {
       calcula();
@@ -561,8 +530,72 @@
         });
       }
     });
+  }
 
-    calcula();
+  // 2. "Quant hauries de cobrar?": salari + any de referència
+  function calcInflacio() {
+    var C = window.CONFIG;
+    var salari = $("inpSalariInf"), anyRef = $("inpAnyInf");
+
+    Object.keys(C.IPC_ANUAL).sort().forEach(function (a) {
+      var op = document.createElement("option");
+      op.value = a; op.textContent = a;
+      if (a === "2020") op.selected = true;
+      anyRef.appendChild(op);
+    });
+
+    function calcula() {
+      var s = num(salari);
+      if (s <= 0) return;
+      var any = anyRef.value;
+      var factor = C.IPC_ULTIM.valor / C.IPC_ANUAL[any];
+      var equivalent = s * factor;
+      $("resPoder").querySelector("strong").textContent =
+        FMT0.format(equivalent) + " €";
+      $("resPoderNota").textContent =
+        "hauries de cobrar hui per a comprar el mateix que amb " +
+        FMT0.format(s) + " € l'any " + any + " (inflació provincial +" +
+        coma(100 * (factor - 1)) + "% fins a " + C.IPC_ULTIM.etiqueta + ")";
+      $("resPerdua").querySelector("strong").textContent =
+        "−" + FMT0.format(equivalent - s) + " €/mes";
+      $("resPerduaNota").textContent =
+        "de poder adquisitiu estàs perdent cada mes si cobres igual que l'any " +
+        any;
+    }
+
+    escolta([salari, anyRef], calcula);
+  }
+
+  // 3. "I si vullgueres comprar?": només el salari
+  function calcCompra() {
+    var C = window.CONFIG;
+    var salari = $("inpSalariCompra");
+
+    function calcula() {
+      var s = num(salari);
+      if (s <= 0) return;
+      var preu = C.PREU_M2_TAXAT * C.SUPERFICIE_TIPUS_M2;
+      $("resComprar").querySelector("strong").textContent =
+        coma(preu / (s * 12)) + " anys";
+      $("resComprarNota").textContent =
+        "de salari íntegre per a una vivenda de " + C.SUPERFICIE_TIPUS_M2 +
+        " m² (" + FMT0.format(preu) + " €, valor taxat " + C.ANY_PREU + ")";
+      var entrada = preu * C.ENTRADA_PCT;
+      $("resEntrada").querySelector("strong").textContent =
+        coma(entrada / (s * 12 * C.ESTALVI_PCT)) + " anys";
+      $("resEntradaNota").textContent =
+        "estalviant el " + Math.round(C.ESTALVI_PCT * 100) +
+        "% del teu sou per a l'entrada i les despeses de compra (" +
+        FMT0.format(entrada) + " €)";
+    }
+
+    escolta([salari], calcula);
+  }
+
+  function iniciaCalculadora() {
+    calcLloguer();
+    calcInflacio();
+    calcCompra();
   }
 
   // ---------- metodologia ----------

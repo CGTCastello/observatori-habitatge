@@ -199,7 +199,7 @@
   <!-- ================= CALCULADORA ================= -->
   <section id="calculadora" aria-labelledby="titolCalc">
     <div class="contenidor">
-      <h2 id="titolCalc">Quant et costa viure?</h2>
+      <h2 id="titolCalc">Quant se't menja el lloguer?</h2>
       <p>Posa el teu sou i el teu lloguer (o hipoteca) i mira què diuen els
         números de la teua situació.</p>
       <div class="calc-caixa">
@@ -213,10 +213,6 @@
             <label for="inpLloguer">Lloguer o quota mensual (€)</label>
             <input type="number" id="inpLloguer" min="0" max="3000" step="10" value="600" inputmode="numeric">
           </div>
-          <div>
-            <label for="inpAny">Compara el teu sou amb l'any…</label>
-            <select id="inpAny"></select>
-          </div>
         </div>
         <div class="calc-resultats">
           <div class="resultat" id="resEsforc">
@@ -227,29 +223,19 @@
             <strong>–</strong>
             <span>dies al mes treballes només per a pagar la vivenda</span>
           </div>
-          <div class="resultat" id="resPoder">
-            <strong>–</strong>
-            <span id="resPoderNota"></span>
-          </div>
-          <div class="resultat" id="resComprar">
-            <strong>–</strong>
-            <span id="resComprarNota"></span>
-          </div>
           <div class="resultat" id="resIrav">
             <strong>–</strong>
             <span id="resIravNota"></span>
           </div>
-          <div class="resultat" id="resEntrada">
-            <strong>–</strong>
-            <span id="resEntradaNota"></span>
-          </div>
         </div>
         <button class="compartir" id="btnCompartir">Compartix el teu resultat</button>
         <p class="calc-nota">Càlcul orientatiu fet al teu navegador: no
-          s'envia cap dada. Constants (IPC provincial, preu taxat, mitjanes
-          locals) actualitzades amb les fonts i dates indicades a la
+          s'envia cap dada. Constants (mitjanes locals, IRAV) actualitzades
+          amb les fonts i dates indicades a la
           <a href="#metodologia">metodologia</a>. El llindar del 30% és el
-          criteri estàndard de sobrecàrrega de despesa en vivenda.</p>
+          criteri estàndard de sobrecàrrega de despesa en vivenda. Més avall
+          tens dues calculadores més: <a href="#calcInflacio">quant hauries de
+          cobrar</a> i <a href="#calcCompra">què costa comprar</a>.</p>
       </div>
     </div>
   </section>
@@ -336,6 +322,35 @@
           no el sou per hora. Fonts: AEAT + SERPAVI.</figcaption>
         <details class="taula"><summary>Vore les dades en taula</summary></details>
       </figure>
+
+      <div class="calc-caixa suau" id="calcInflacio">
+        <h3>Quant hauries de cobrar?</h3>
+        <p>La inflació acumulada des de l'any que tries, aplicada al teu sou:
+          si no te l'han pujat des de llavors, açò és el que estàs perdent.</p>
+        <div class="calc-camps">
+          <div>
+            <label for="inpSalariInf">Salari net mensual (€)</label>
+            <input type="number" id="inpSalariInf" min="0" max="5000" step="10" value="1300" inputmode="numeric">
+          </div>
+          <div>
+            <label for="inpAnyInf">Des de l'any…</label>
+            <select id="inpAnyInf"></select>
+          </div>
+        </div>
+        <div class="calc-resultats">
+          <div class="resultat" id="resPoder">
+            <strong>–</strong>
+            <span id="resPoderNota"></span>
+          </div>
+          <div class="resultat" id="resPerdua">
+            <strong>–</strong>
+            <span id="resPerduaNota"></span>
+          </div>
+        </div>
+        <p class="calc-nota">IPC general de la província de Castelló (INE),
+          acumulat des de la mitjana de l'any triat fins a l'última dada
+          mensual. Fonts i dates a la <a href="#metodologia">metodologia</a>.</p>
+      </div>
     </div>
   </section>
 
@@ -362,6 +377,31 @@
           Font: INE, Estadística d'Hipoteques.</figcaption>
         <details class="taula"><summary>Vore les dades en taula</summary></details>
       </figure>
+
+      <div class="calc-caixa suau" id="calcCompra">
+        <h3>I si vullgueres comprar?</h3>
+        <p>Amb el teu sou, què costa la vivenda mitjana de Castelló ciutat
+          (90 m² a valor taxat).</p>
+        <div class="calc-camps">
+          <div>
+            <label for="inpSalariCompra">Salari net mensual (€)</label>
+            <input type="number" id="inpSalariCompra" min="0" max="5000" step="10" value="1300" inputmode="numeric">
+          </div>
+        </div>
+        <div class="calc-resultats">
+          <div class="resultat" id="resComprar">
+            <strong>–</strong>
+            <span id="resComprarNota"></span>
+          </div>
+          <div class="resultat" id="resEntrada">
+            <strong>–</strong>
+            <span id="resEntradaNota"></span>
+          </div>
+        </div>
+        <p class="calc-nota">Valor taxat mitjà de la ciutat (MIVAU) i
+          paràmetres del càlcul (entrada del 20% + 10% de despeses, estalvi
+          del 15% del net) documentats a la <a href="#metodologia">metodologia</a>.</p>
+      </div>
     </div>
   </section>
 
