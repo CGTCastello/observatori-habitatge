@@ -41,12 +41,16 @@ actualizarla.
 
 ## Wiki (Obsidian)
 
+*(Solo en local: no se incluye en el repositorio publicado.)*
+
 `wiki/` es la versión markdown de todo el contenido (series completas en
 tablas, indicadores, metodología y una página por municipio), con enlaces
 [[wikilink]], regenerada desde los JSON por `gen_wiki.py`. No editar a mano:
 se sobrescribe con cada build.
 
 ## Formación
+
+*(Solo en local: no se incluye en el repositorio publicado.)*
 
 `formacion/` contiene el material de la sesión formativa interna: guion de 90
 minutos (`guion-sessio.md`) y argumentario de réplicas con fuente

@@ -3,3 +3,7 @@ __pycache__/
 scripts/cache/
 .DS_Store
 .claude/settings.local.json
+
+# material interno y wiki personal: solo en local, no en el repo publicado
+formacion/
+wiki/
