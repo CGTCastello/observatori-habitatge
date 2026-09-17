@@ -20,7 +20,6 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/fetch_censo.py     # Censo 2021: parque y tenencia municipal
 .venv/bin/python scripts/gen_og.py          # OG image para redes (web/img/)
 .venv/bin/python scripts/gen_fichas.py      # fichas municipales (formacion/fichas/)
-.venv/bin/python scripts/gen_wiki.py        # wiki markdown para Obsidian (wiki/)
 ```
 
 `build_all.py --fetch` ejecuta antes todos los fetchers. Cada indicador tiene
@@ -38,15 +37,6 @@ abortan sin tocar el JSON bueno anterior. Las descargas pesadas se cachean en
 La URL del XLSX de SERPAVI cambia con cada publicación anual: está en la
 constante `XLSX_URL` de `scripts/fetch_serpavi.py`, con instrucciones para
 actualizarla.
-
-## Wiki (Obsidian)
-
-*(Solo en local: no se incluye en el repositorio publicado.)*
-
-`wiki/` es la versión markdown de todo el contenido (series completas en
-tablas, indicadores, metodología y una página por municipio), con enlaces
-[[wikilink]], regenerada desde los JSON por `gen_wiki.py`. No editar a mano:
-se sobrescribe con cada build.
 
 ## Formación
 
