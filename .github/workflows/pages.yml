@@ -24,6 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # Marca d'aigua de versió: substitueix ?v=... de l'index pel SHA del
+      # commit, perquè els navegadors no es queden amb el CSS/JS antic.
+      - name: Versionar els recursos
+        run: sed -i "s/?v=[0-9a-zA-Z]*/?v=${GITHUB_SHA::8}/g" web/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web

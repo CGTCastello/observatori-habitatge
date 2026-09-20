@@ -16,7 +16,7 @@
                  "precio_vivienda", "hipotecas", "meta"];
 
   function carrega(nom) {
-    return fetch("data/" + nom + ".json").then(function (r) {
+    return fetch("data/" + nom + ".json", { cache: "no-cache" }).then(function (r) {
       if (!r.ok) throw new Error(nom + ": HTTP " + r.status);
       return r.json();
     });

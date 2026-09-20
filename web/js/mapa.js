@@ -8,7 +8,7 @@
   var iniciat = false;
 
   function carrega(nom) {
-    return fetch("data/" + nom).then(function (r) {
+    return fetch("data/" + nom, { cache: "no-cache" }).then(function (r) {
       if (!r.ok) throw new Error(nom + ": HTTP " + r.status);
       return r.json();
     });
