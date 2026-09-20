@@ -1,17 +1,23 @@
 /* Observatori de l'Habitatge de Castelló — CGT Castelló
-   Mobile-first, identitat rojinegra sobre fons clar, dades protagonistes. */
+   Mobile-first, dades protagonistes. Identitat visual alineada amb
+   cgtcastello.org: mateixos colors (--roig, --negre, --groc, --linia),
+   Anton per als titulars, Open Sans per al text, cantons rectes. */
 
 :root {
-  --roig: #e30613;
-  --roig-fosc: #b00510;
-  --negre: #1a1a1a;
-  --gris: #555;
-  --gris-clar: #e8e6e1;
-  --fons: #faf9f7;
+  --roig: #d81f1f;
+  --roig-fosc: #b01818;
+  --negre: #1b1a18;
+  --gris: #5f5e59;
+  --gris-clar: #e4e2dd;
+  --groc: #e9e84c;
+  --fons: #f7f6f4;
   --blanc: #fff;
   --verd: #1a7a3c;
   --taronja: #c96a00;
-  --max-ample: 60rem;
+  --titol: "Anton", "Arial Narrow", Impact, sans-serif;
+  --text: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --max-ample: 1180px;
   font-size: 100%;
 }
 
@@ -19,91 +25,158 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--text);
   background: var(--fons);
   color: var(--negre);
   line-height: 1.55;
 }
 
-h1, h2, h3 { line-height: 1.15; font-weight: 800; }
-h2 { font-size: 1.6rem; margin: 0 0 .5rem; }
-h2::before { content: "— "; color: var(--roig); }
-h3 { font-size: 1.1rem; margin: 1.5rem 0 .5rem; }
+h1, h2, h3 { line-height: 1.1; }
+h1, h2 {
+  font-family: var(--titol);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+h2 { font-size: clamp(1.6rem, 4vw, 2.5rem); margin: 0 0 .6rem; }
+/* barra roja inclinada davant del títol, com a cgtcastello.org */
+h2::before {
+  content: "/";
+  font-family: var(--text);
+  font-style: italic;
+  font-weight: 900;
+  font-size: .62em;
+  color: var(--roig);
+  margin-right: .35em;
+  vertical-align: 1px;
+}
+h3 { font-size: 1.15rem; font-weight: 800; margin: 1.5rem 0 .5rem; }
 a { color: var(--roig-fosc); }
 p { margin: .5rem 0 1rem; }
 
-.contenidor { max-width: var(--max-ample); margin: 0 auto; padding: 0 1rem; }
+.contenidor { max-width: var(--max-ample); margin: 0 auto; padding: 0 1.5rem; }
+
+/* ---------- barra superior (tornada a la web del sindicat) ---------- */
+.barra-sindicat {
+  background: var(--negre);
+  color: var(--blanc);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.barra-sindicat .contenidor {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1.1rem;
+  padding-top: .45rem; padding-bottom: .45rem;
+}
+.barra-sindicat a { color: var(--blanc); text-decoration: none; opacity: .88; }
+.barra-sindicat a:hover, .barra-sindicat a:focus {
+  opacity: 1; color: var(--groc);
+}
+.barra-sindicat .torna::before { content: "← "; }
+@media (max-width: 600px) {
+  .barra-sindicat .contenidor {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+  }
+  .barra-sindicat .contenidor::-webkit-scrollbar { display: none; }
+  .barra-sindicat a { white-space: nowrap; }
+}
 
 /* ---------- capçalera / navegació ---------- */
 header.principal {
-  background: var(--negre);
-  color: var(--blanc);
-  padding: .6rem 0;
+  background: var(--blanc);
+  border-bottom: 1px solid var(--gris-clar);
+  padding: .5rem 0;
   position: sticky;
   top: 0;
   z-index: 50;
 }
 header.principal .contenidor {
-  display: flex; align-items: center; gap: .8rem;
+  display: flex; align-items: center; gap: 1rem;
 }
 .logo-cgt {
-  background: var(--roig); color: var(--blanc);
-  font-weight: 800; padding: .15rem .5rem; letter-spacing: .05em;
-  flex-shrink: 0; text-decoration: none;
+  display: flex; align-items: center; gap: .55rem;
+  flex-shrink: 0; text-decoration: none; color: var(--negre);
+}
+.logo-cgt img { display: block; height: 38px; width: auto; }
+.logo-cgt span {
+  font-family: var(--titol); font-weight: 400; text-transform: uppercase;
+  font-size: 1.05rem; letter-spacing: .5px; line-height: 1.05; max-width: 8.5em;
 }
 nav.ancores {
   overflow-x: auto; white-space: nowrap; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch; margin-left: auto;
 }
 nav.ancores::-webkit-scrollbar { display: none; }
 nav.ancores a {
-  color: var(--blanc); text-decoration: none; font-size: .85rem;
-  margin-right: 1rem; opacity: .85;
+  color: var(--negre); text-decoration: none; font-size: .82rem;
+  font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  margin-left: .95rem; padding-bottom: 2px; border-bottom: 2px solid transparent;
 }
-nav.ancores a:hover, nav.ancores a:focus { opacity: 1; text-decoration: underline; }
+nav.ancores a:hover, nav.ancores a:focus {
+  color: var(--roig); border-bottom-color: var(--roig);
+}
+@media (max-width: 760px) {
+  .logo-cgt span { display: none; }
+  nav.ancores a { margin-left: 0; margin-right: 1rem; }
+}
 
 /* ---------- hero ---------- */
-.hero { background: var(--negre); color: var(--blanc); padding: 2.5rem 0 2rem; }
-.hero h1 { font-size: clamp(1.7rem, 5vw, 2.8rem); margin: 0 0 .5rem; }
+.hero { background: var(--negre); color: var(--blanc); padding: 3rem 0 2.5rem; }
+.hero h1 { font-size: clamp(2rem, 6vw, 4rem); margin: 0 0 .8rem; }
 .hero h1 em { color: var(--roig); font-style: normal; }
-.hero .subtitol { font-size: 1.05rem; opacity: .9; max-width: 44rem; }
+.hero .subtitol {
+  font-size: 1.05rem; opacity: .9; max-width: 46rem;
+}
 .cifres {
   display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 1rem; margin-top: 1.8rem;
+  gap: 1.4rem; margin-top: 2rem;
 }
 @media (min-width: 700px) { .cifres { grid-template-columns: repeat(4, 1fr); } }
-.cifra { border-top: 3px solid var(--roig); padding-top: .5rem; }
+.cifra { border-top: 4px solid var(--roig); padding-top: .6rem; }
 .cifra strong {
-  display: block; font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-  font-weight: 800; color: var(--blanc);
+  display: block; font-family: var(--titol); font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3rem); letter-spacing: .5px; color: var(--blanc);
 }
 .cifra span { font-size: .85rem; opacity: .85; }
-.cifra .font { display: block; font-size: .7rem; opacity: .55; margin-top: .3rem; }
+.cifra .font {
+  display: block; font-size: .68rem; text-transform: uppercase;
+  letter-spacing: .06em; opacity: .55; margin-top: .4rem;
+}
 
 /* ---------- seccions ---------- */
-section { padding: 2.5rem 0 1.5rem; scroll-margin-top: 4rem; }
+section { padding: 3rem 0 2rem; scroll-margin-top: 4.5rem; }
 section:nth-of-type(even) { background: var(--blanc); }
-.entradeta { max-width: 44rem; color: var(--gris); }
+.entradeta { max-width: 46rem; color: var(--gris); }
 
 figure.grafic { margin: 1.5rem 0; }
 figure.grafic .marc {
   position: relative; height: 20rem; background: var(--blanc);
-  border: 1px solid var(--gris-clar); border-radius: 4px; padding: .8rem;
+  border: 1px solid var(--gris-clar); padding: .8rem;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+figure.grafic .marc:hover {
+  transform: translateY(-4px); box-shadow: 7px 7px 0 var(--negre);
 }
 section:nth-of-type(even) figure.grafic .marc { background: var(--fons); }
 figure.grafic figcaption {
-  font-size: .8rem; color: var(--gris); margin-top: .4rem;
+  font-size: .8rem; color: var(--gris); margin-top: .5rem;
 }
 button.descarrega {
-  font-size: .72rem; padding: .1rem .5rem; cursor: pointer;
+  font-size: .68rem; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; padding: .2rem .5rem; cursor: pointer;
   border: 1px solid var(--gris); background: transparent; color: var(--gris);
-  border-radius: 3px; vertical-align: 1px;
+  vertical-align: 1px;
 }
-button.descarrega:hover { border-color: var(--roig); color: var(--roig-fosc); }
+button.descarrega:hover {
+  border-color: var(--roig); background: var(--roig); color: var(--blanc);
+}
 
 details.taula { margin-top: .4rem; font-size: .85rem; }
-details.taula summary { cursor: pointer; color: var(--gris); }
+details.taula summary {
+  cursor: pointer; color: var(--gris); font-weight: 700;
+  text-transform: uppercase; font-size: .75rem; letter-spacing: .05em;
+}
 details.taula table { border-collapse: collapse; margin-top: .5rem; width: 100%; }
 details.taula th, details.taula td {
   border: 1px solid var(--gris-clar); padding: .25rem .5rem; text-align: right;
@@ -111,30 +184,40 @@ details.taula th, details.taula td {
 details.taula th:first-child, details.taula td:first-child { text-align: left; }
 
 .destacat {
-  border-left: 4px solid var(--roig); background: var(--blanc);
-  padding: .8rem 1rem; margin: 1rem 0; max-width: 44rem;
+  border-left: 5px solid var(--roig); background: var(--blanc);
+  padding: 1rem 1.2rem; margin: 1.2rem 0; max-width: 46rem;
 }
 section:nth-of-type(even) .destacat { background: var(--fons); }
-.destacat strong { color: var(--roig-fosc); }
+/* subratllat groc del sindicat per a la xifra que importa */
+.destacat strong {
+  color: var(--negre);
+  background: linear-gradient(transparent 58%, var(--groc) 58%);
+}
 
 /* ---------- calculadora ---------- */
 #calculadora { background: var(--roig); color: var(--blanc); }
 #calculadora h2 { color: var(--blanc); }
-#calculadora h2::before { content: "— "; color: var(--negre); }
+#calculadora h2::before { color: var(--negre); }
+#calculadora > .contenidor > p a { color: var(--blanc); }
+.calc-caixa a { color: var(--roig-fosc); }
 .calc-caixa {
-  background: var(--blanc); color: var(--negre); border-radius: 6px;
-  padding: 1.2rem; margin-top: 1rem;
+  background: var(--blanc); color: var(--negre);
+  padding: 1.4rem; margin-top: 1.2rem;
 }
 /* variant per a les calculadores dins de seccions clares */
 .calc-caixa.suau { border: 2px solid var(--negre); margin: 2rem 0 1rem; }
 .calc-caixa.suau h3 { margin-top: 0; }
-.calc-caixa.suau h3::before { content: "▸ "; color: var(--roig); }
+.calc-caixa.suau h3::before { content: "/ "; color: var(--roig); font-style: italic; }
 .calc-camps { display: grid; gap: 1.2rem; }
 @media (min-width: 700px) { .calc-camps { grid-template-columns: 1fr 1fr 1fr; } }
-.calc-camps label { font-weight: 700; font-size: .9rem; display: block; }
+.calc-camps label {
+  font-weight: 800; font-size: .78rem; display: block;
+  text-transform: uppercase; letter-spacing: .05em;
+}
 .calc-camps input[type="number"], .calc-camps select {
   width: 100%; padding: .5rem; font-size: 1.1rem; margin-top: .3rem;
-  border: 2px solid var(--negre); border-radius: 4px; background: var(--blanc);
+  font-family: var(--text);
+  border: 2px solid var(--negre); background: var(--blanc);
 }
 .calc-camps input[type="range"] { width: 100%; accent-color: var(--roig); }
 .calc-resultats {
@@ -142,33 +225,39 @@ section:nth-of-type(even) .destacat { background: var(--fons); }
   grid-template-columns: repeat(2, 1fr);
 }
 @media (min-width: 700px) { .calc-resultats { grid-template-columns: repeat(4, 1fr); } }
-.resultat { border-top: 3px solid var(--gris-clar); padding-top: .4rem; }
-.resultat strong { display: block; font-size: 1.7rem; font-weight: 800; }
+.resultat { border-top: 3px solid var(--gris-clar); padding-top: .5rem; }
+.resultat strong {
+  display: block; font-family: var(--titol); font-weight: 400;
+  font-size: 2rem; letter-spacing: .5px;
+}
+@media (max-width: 600px) { .resultat strong { font-size: 1.6rem; } }
 .resultat span { font-size: .8rem; color: var(--gris); }
 .resultat.ok strong { color: var(--verd); }
 .resultat.alerta strong { color: var(--taronja); }
 .resultat.perill strong { color: var(--roig); }
 .calc-nota { font-size: .75rem; color: var(--gris); margin-top: 1rem; }
 button.compartir {
-  margin-top: 1rem; background: var(--negre); color: var(--blanc);
-  font-size: 1rem; font-weight: 700; border: 0; padding: .7rem 1.2rem;
-  border-radius: 4px; cursor: pointer;
+  margin-top: 1.2rem; background: var(--negre); color: var(--blanc);
+  font-family: var(--text); font-size: .85rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase;
+  border: 0; padding: .85rem 1.5rem; cursor: pointer;
 }
-button.compartir:hover { background: var(--roig-fosc); }
+button.compartir:hover { background: var(--roig); }
 
 /* ---------- mapa ---------- */
 #elMapa {
-  height: 26rem; border: 1px solid var(--gris-clar); border-radius: 4px;
+  height: 26rem; border: 1px solid var(--gris-clar);
   background: #dfe8ee; z-index: 1;
 }
 @media (min-width: 700px) { #elMapa { height: 32rem; } }
 .commutador { margin: 1rem 0 .8rem; }
 .commutador button {
-  font-size: .95rem; font-weight: 700; padding: .5rem 1rem; cursor: pointer;
+  font-family: var(--text); font-size: .8rem; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: .55rem 1.1rem; cursor: pointer;
   border: 2px solid var(--negre); background: var(--blanc); color: var(--negre);
-  border-radius: 4px 0 0 4px;
 }
-.commutador button + button { border-left: 0; border-radius: 0 4px 4px 0; }
+.commutador button + button { border-left: 0; }
 .commutador button.actiu { background: var(--negre); color: var(--blanc); }
 .llegenda { font-size: .8rem; color: var(--gris); line-height: 1.9; }
 .llegenda .clau {
@@ -186,23 +275,45 @@ button.compartir:hover { background: var(--roig-fosc); }
   border: 1px solid var(--gris-clar); padding: .4rem .6rem; text-align: left;
   vertical-align: top;
 }
-#metodologia th { background: var(--gris-clar); }
+#metodologia th {
+  background: var(--negre); color: var(--blanc);
+  text-transform: uppercase; font-size: .75rem; letter-spacing: .05em;
+}
 
 /* ---------- CTA ---------- */
-#cta { background: var(--negre); color: var(--blanc); text-align: center; }
+#cta { background: var(--negre); color: var(--blanc); }
 #cta h2 { color: var(--blanc); }
+#cta p { max-width: 46rem; }
 #cta a.boto {
   display: inline-block; background: var(--roig); color: var(--blanc);
-  font-weight: 800; text-decoration: none; padding: .8rem 1.6rem;
-  border-radius: 4px; margin: .5rem;
+  font-weight: 800; font-size: .85rem; letter-spacing: .08em;
+  text-transform: uppercase; text-decoration: none;
+  padding: .9rem 1.6rem; margin: .5rem .5rem .5rem 0;
 }
-#cta a.boto:hover { background: var(--roig-fosc); }
+#cta a.boto:hover { background: var(--blanc); color: var(--negre); }
+#cta a.boto.groc { background: var(--groc); color: var(--negre); }
+#cta a.boto.groc:hover { background: var(--blanc); }
 
+/* ---------- peu ---------- */
 footer.peu {
   background: var(--negre); color: var(--blanc); font-size: .8rem;
-  padding: 1rem 0 2rem; opacity: .85;
+  padding: 2rem 0 2.5rem;
 }
 footer.peu a { color: var(--blanc); }
+footer.peu a:hover { color: var(--groc); }
+footer.peu p { opacity: .8; max-width: 46rem; }
+.peu-enllacos {
+  display: flex; flex-wrap: wrap; gap: 1.2rem;
+  margin: 0 0 1.2rem; padding: 0; list-style: none;
+  font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+}
+.peu-enllacos a { text-decoration: none; }
+.peu-marca {
+  display: flex; align-items: center; gap: .6rem;
+  margin: 0 0 1.2rem; font-family: var(--titol); font-weight: 400;
+  text-transform: uppercase; letter-spacing: .5px; font-size: 1.1rem;
+}
+.peu-marca img { height: 34px; width: auto; display: block; }
 
 /* accessibilitat */
 .visualment-ocult {
@@ -212,4 +323,5 @@ footer.peu a { color: var(--blanc); }
 :focus-visible { outline: 3px solid var(--roig); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+  figure.grafic .marc:hover { transform: none; }
 }

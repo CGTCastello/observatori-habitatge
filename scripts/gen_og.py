@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 from common import DATA_DIR, ROOT, die, log
 
 ANCHO, ALTO = 1200, 630
-NEGRE, ROIG, BLANC, GRIS = "#1a1a1a", "#e30613", "#ffffff", "#b5b5b5"
+NEGRE, ROIG, BLANC, GRIS = "#1b1a18", "#d81f1f", "#ffffff", "#b5b5b5"
 FONT = "/System/Library/Fonts/Helvetica.ttc"
 
 

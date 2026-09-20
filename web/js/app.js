@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var ROIG = "#e30613", NEGRE = "#1a1a1a", GRIS = "#8a8a8a",
+  var ROIG = "#d81f1f", NEGRE = "#1b1a18", GRIS = "#8a8a8a",
       BLAU = "#25567a", TARONJA = "#c96a00", VERD = "#1a7a3c";
   var FMT = new Intl.NumberFormat("ca-ES", { maximumFractionDigits: 1 });
   var FMT0 = new Intl.NumberFormat("ca-ES", { maximumFractionDigits: 0 });
