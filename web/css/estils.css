@@ -17,7 +17,7 @@
   --titol: "Anton", "Arial Narrow", Impact, sans-serif;
   --text: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  --max-ample: 1180px;
+  --max-ample: 1060px;
   font-size: 100%;
 }
 
@@ -54,7 +54,10 @@ h3 { font-size: 1.15rem; font-weight: 800; margin: 1.5rem 0 .5rem; }
 a { color: var(--roig-fosc); }
 p { margin: .5rem 0 1rem; }
 
-.contenidor { max-width: var(--max-ample); margin: 0 auto; padding: 0 1.5rem; }
+.contenidor {
+  max-width: var(--max-ample); margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+}
 
 /* ---------- capçalera ---------- */
 header.principal {
@@ -66,7 +69,7 @@ header.principal {
   z-index: 50;
 }
 header.principal .contenidor {
-  display: flex; align-items: stretch; gap: 1.2rem; padding: 0 1.5rem;
+  display: flex; align-items: stretch; gap: 1.2rem;
 }
 .marca {
   display: flex; align-items: center; gap: .7rem;
