@@ -380,35 +380,8 @@
     });
   }
 
-  // ---------- compartibles: PNG dels gràfics i cites amb font ----------
+  // ---------- compartibles: cites amb font ----------
   function iniciaCompartibles() {
-    document.querySelectorAll("figure.grafic").forEach(function (fig) {
-      var canvas = fig.querySelector("canvas");
-      var cap = fig.querySelector("figcaption");
-      if (!canvas || !cap) return;
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "descarrega";
-      b.textContent = "⤓ PNG";
-      b.setAttribute("aria-label", "Descarrega este gràfic com a imatge PNG");
-      b.addEventListener("click", function () {
-        if (pendents[canvas.id]) {          // encara no s'ha dibuixat
-          pendents[canvas.id]();
-          delete pendents[canvas.id];
-        }
-        setTimeout(function () {
-          var chart = Chart.getChart(canvas);
-          if (!chart) return;
-          var a = document.createElement("a");
-          a.href = chart.toBase64Image("image/png", 1);
-          a.download = "observatori-castello-" + canvas.id + ".png";
-          a.click();
-        }, 150);
-      });
-      cap.appendChild(document.createTextNode(" "));
-      cap.appendChild(b);
-    });
-
     var url = location.href.split("#")[0];
     document.querySelectorAll("#dades-clau ul li").forEach(function (li) {
       var b = document.createElement("button");

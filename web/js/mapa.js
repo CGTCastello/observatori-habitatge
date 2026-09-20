@@ -107,6 +107,17 @@
 
       var capaActual = "renda";
       var capaGeo;
+      var limits = L.geoJSON(geo).getBounds();
+      var mogutPerLusuari = false;
+
+      // Enquadra la ciutat dins del marc. Es torna a cridar quan canvia la
+      // mida del contenidor: si el mapa es crea abans que el navegador haja
+      // acabat la maquetació, Leaflet es queda amb una mida antiga i el
+      // dibuix ix xicotet i descentrat.
+      function enquadra() {
+        mapa.invalidateSize({ animate: false });
+        mapa.fitBounds(limits, { padding: [12, 12], animate: false });
+      }
 
       function pinta(nomCapa) {
         capaActual = nomCapa;
@@ -129,10 +140,7 @@
               { sticky: true });
           },
         }).addTo(mapa);
-        if (!mapa._zoomInicial) {
-          mapa.fitBounds(capaGeo.getBounds());
-          mapa._zoomInicial = true;
-        }
+        if (!mogutPerLusuari) enquadra();
         // llegenda
         var leg = document.getElementById("llegendaMapa");
         var html = "<strong>" + c.titol + "</strong> · font: " + c.font + "<br>";
@@ -160,6 +168,27 @@
       });
 
       pinta(capaActual);
+
+      // l'usuari mana: si mou o fa zoom, ja no reenquadrem
+      mapa.on("dragstart zoomstart", function () { mogutPerLusuari = true; });
+
+      var contenidorMapa = document.getElementById("elMapa");
+      if (window.ResizeObserver) {
+        new ResizeObserver(function () {
+          if (!mogutPerLusuari) enquadra();
+        }).observe(contenidorMapa);
+      } else {
+        window.addEventListener("resize", function () {
+          if (!mogutPerLusuari) enquadra();
+        });
+      }
+      // després de les fonts web i de qualsevol reflux inicial
+      setTimeout(function () { if (!mogutPerLusuari) enquadra(); }, 300);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+          if (!mogutPerLusuari) enquadra();
+        });
+      }
     }).catch(function (err) {
       console.error("Error carregant el mapa:", err);
       var el = document.getElementById("elMapa");
