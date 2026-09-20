@@ -56,69 +56,59 @@ p { margin: .5rem 0 1rem; }
 
 .contenidor { max-width: var(--max-ample); margin: 0 auto; padding: 0 1.5rem; }
 
-/* ---------- barra superior (tornada a la web del sindicat) ---------- */
-.barra-sindicat {
+/* ---------- capçalera ---------- */
+header.principal {
   background: var(--negre);
   color: var(--blanc);
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.barra-sindicat .contenidor {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 1.1rem;
-  padding-top: .45rem; padding-bottom: .45rem;
-}
-.barra-sindicat a { color: var(--blanc); text-decoration: none; opacity: .88; }
-.barra-sindicat a:hover, .barra-sindicat a:focus {
-  opacity: 1; color: var(--groc);
-}
-.barra-sindicat .torna::before { content: "← "; }
-@media (max-width: 600px) {
-  .barra-sindicat .contenidor {
-    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
-  }
-  .barra-sindicat .contenidor::-webkit-scrollbar { display: none; }
-  .barra-sindicat a { white-space: nowrap; }
-}
-
-/* ---------- capçalera / navegació ---------- */
-header.principal {
-  background: var(--blanc);
-  border-bottom: 1px solid var(--gris-clar);
-  padding: .5rem 0;
+  border-bottom: 3px solid var(--roig);
   position: sticky;
   top: 0;
   z-index: 50;
 }
 header.principal .contenidor {
-  display: flex; align-items: center; gap: 1rem;
+  display: flex; align-items: stretch; gap: 1.2rem; padding: 0 1.5rem;
 }
-.logo-cgt {
-  display: flex; align-items: center; gap: .55rem;
-  flex-shrink: 0; text-decoration: none; color: var(--negre);
+.marca {
+  display: flex; align-items: center; gap: .7rem;
+  flex-shrink: 0; text-decoration: none; color: var(--blanc);
+  padding: .55rem 0;
 }
-.logo-cgt img { display: block; height: 38px; width: auto; }
-.logo-cgt span {
+.marca-sigles {
+  background: var(--roig); color: var(--blanc);
+  font-family: var(--titol); font-weight: 400; font-size: 1.35rem;
+  letter-spacing: .06em; line-height: 1;
+  padding: .32rem .45rem .22rem;
+}
+.marca-nom {
   font-family: var(--titol); font-weight: 400; text-transform: uppercase;
-  font-size: 1.05rem; letter-spacing: .5px; line-height: 1.05; max-width: 8.5em;
+  font-size: .92rem; line-height: 1.06; letter-spacing: .5px;
 }
 nav.ancores {
-  overflow-x: auto; white-space: nowrap; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch; margin-left: auto;
+  display: flex; align-items: center; margin-left: auto;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
 }
 nav.ancores::-webkit-scrollbar { display: none; }
 nav.ancores a {
-  color: var(--negre); text-decoration: none; font-size: .82rem;
-  font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
-  margin-left: .95rem; padding-bottom: 2px; border-bottom: 2px solid transparent;
+  color: var(--blanc); text-decoration: none; white-space: nowrap;
+  font-size: .78rem; font-weight: 700; letter-spacing: .03em;
+  text-transform: uppercase; opacity: .85;
+  padding: 1rem .6rem; border-bottom: 3px solid transparent; margin-bottom: -3px;
 }
 nav.ancores a:hover, nav.ancores a:focus {
-  color: var(--roig); border-bottom-color: var(--roig);
+  opacity: 1; color: var(--blanc); border-bottom-color: var(--roig);
 }
-@media (max-width: 760px) {
-  .logo-cgt span { display: none; }
-  nav.ancores a { margin-left: 0; margin-right: 1rem; }
+header.principal .torna {
+  display: flex; align-items: center; flex-shrink: 0;
+  color: var(--blanc); text-decoration: none; white-space: nowrap;
+  font-size: .72rem; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; opacity: .7;
+  padding-left: 1.2rem; border-left: 1px solid #3a3733;
+}
+header.principal .torna::before { content: "← "; }
+header.principal .torna:hover { opacity: 1; color: var(--groc); }
+@media (max-width: 900px) {
+  .marca-nom { display: none; }
+  header.principal .torna { display: none; }
 }
 
 /* ---------- hero ---------- */
@@ -296,24 +286,42 @@ button.compartir:hover { background: var(--roig); }
 
 /* ---------- peu ---------- */
 footer.peu {
-  background: var(--negre); color: var(--blanc); font-size: .8rem;
-  padding: 2rem 0 2.5rem;
+  background: var(--negre); color: var(--blanc);
+  border-top: 4px solid var(--roig);
+  font-size: .85rem;
+  padding: 2.8rem 0 2.2rem;
 }
-footer.peu a { color: var(--blanc); }
-footer.peu a:hover { color: var(--groc); }
-footer.peu p { opacity: .8; max-width: 46rem; }
-.peu-enllacos {
-  display: flex; flex-wrap: wrap; gap: 1.2rem;
-  margin: 0 0 1.2rem; padding: 0; list-style: none;
-  font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+footer.peu a { color: var(--blanc); text-decoration: none; }
+footer.peu a:hover, footer.peu a:focus { color: var(--groc); text-decoration: underline; }
+.peu-graella {
+  display: grid; gap: 2rem 3rem;
+  grid-template-columns: 1fr;
 }
-.peu-enllacos a { text-decoration: none; }
-.peu-marca {
-  display: flex; align-items: center; gap: .6rem;
-  margin: 0 0 1.2rem; font-family: var(--titol); font-weight: 400;
-  text-transform: uppercase; letter-spacing: .5px; font-size: 1.1rem;
+@media (min-width: 700px) {
+  .peu-graella { grid-template-columns: 1.4fr 1fr 1fr; }
 }
-.peu-marca img { height: 34px; width: auto; display: block; }
+.peu-titol {
+  font-family: var(--titol); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.02; letter-spacing: .5px;
+  margin: 0 0 .5rem;
+}
+.peu-sindicat {
+  margin: 0; color: #a8a49b; font-size: .8rem;
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 700;
+}
+.peu-etiqueta {
+  margin: 0 0 .7rem; color: var(--roig);
+  font-size: .72rem; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.peu-bloc ul { list-style: none; margin: 0; padding: 0; }
+.peu-bloc li { margin: 0 0 .45rem; }
+.peu-llegal {
+  margin: 2.2rem 0 0; padding-top: 1.2rem;
+  border-top: 1px solid #3a3733;
+  color: #a8a49b; font-size: .78rem; max-width: 50rem;
+}
+.peu-llegal a { text-decoration: underline; }
 
 /* accessibilitat */
 .visualment-ocult {
