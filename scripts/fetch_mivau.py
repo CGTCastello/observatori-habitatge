@@ -23,9 +23,17 @@ URL_PROV = "https://apps.fomento.gob.es/BoletinOnline2/sedal/35101000.XLS"
 URL_MUNI = "https://apps.fomento.gob.es/BoletinOnline2/sedal/35103500.XLS"
 
 
+# Rango de plausibilidad del €/m² tasado: la serie provincial va de ~435
+# (1995) a ~1.465 (2026). Las hojas traen columnas de trimestres aún no
+# publicados con variaciones o notas al pie (1,3 / 14,6 ...) que se colaban
+# como si fueran precios y estropeaban la media anual.
+EUR_M2_MIN, EUR_M2_MAX = 200.0, 6000.0
+
+
 def val(c):
     if isinstance(c, (int, float)):
-        return rnd(c, 1)
+        v = rnd(c, 1)
+        return v if EUR_M2_MIN <= v <= EUR_M2_MAX else None
     return None  # 'n.r' (no representativo), vacíos, texto
 
 

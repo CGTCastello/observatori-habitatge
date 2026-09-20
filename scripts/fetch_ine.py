@@ -22,8 +22,10 @@ BASE = "https://servicios.ine.es/wstempus/js/ES"
 T_IPC = 24081        # Índice general por provincias, serie mensual larga
 T_ETDP = 6149        # Viviendas transmitidas según título de adquisición (prov.)
 T_HIPO = 76317       # Hipotecas por naturaleza de finca, nº e importe (prov.)
-T_IPV_2015 = 76201   # IPV trimestral por CCAA, base 2015
-T_IPV_NUEVA = 79540  # IPV trimestral por CCAA, base nueva
+# El INE retiró en 2026 la tabla 76201 (IPV base 2015). La serie trimestral
+# por CCAA vive ahora en la 80270; si vuelve a cambiar, se busca con
+# TABLAS_OPERACION/IPV y se coge la de "Índices por CCAA ... Trimestrales".
+T_IPV = 80270        # IPV trimestral por CCAA
 T_ADRH = 30962       # ADRH provincia de Castellón (municipios/distritos/secciones)
 T_IRAV = 72975       # Índice de Referencia de Arrendamientos de Vivienda (nacional)
 
@@ -181,34 +183,22 @@ def fetch_hipotecas():
 
 
 def fetch_ipv():
-    out = {}
-    for clave, tid, obligatorio in [("base_2015", T_IPV_2015, True),
-                                    ("base_nueva", T_IPV_NUEVA, False)]:
-        try:
-            series = datos_tabla(tid, nult=200)
-        except SystemExit:
-            if obligatorio:
-                raise
-            log(f"IPV tabla {tid} no disponible; se omite {clave}")
-            continue
-        got = pick(series, "comunitat valenciana", "general", "indice")
-        if len(got) != 1:
-            if obligatorio:
-                die(f"IPV {tid}: esperaba 1 serie CV, hay {len(got)}")
-            log(f"IPV tabla {tid}: {len(got)} series CV; se omite {clave}")
-            continue
-        out[clave] = {"tabla": tid, "serie": got[0]["COD"],
-                      "trimestral": trimestral(datos(got[0]))}
-    if "base_2015" not in out or len(out["base_2015"]["trimestral"]) < 20:
-        die("IPV: serie base 2015 ausente o demasiado corta")
+    series = datos_tabla(T_IPV, nult=200)
+    got = pick(series, "comunitat valenciana", "general", "indice")
+    if len(got) != 1:
+        die(f"IPV {T_IPV}: esperaba 1 serie CV, hay {len(got)}")
+    trim = trimestral(datos(got[0]))
+    if len(trim) < 20:
+        die(f"IPV: solo {len(trim)} trimestres; ¿cambió la tabla?")
     write_json("ipv.json", {
-        "fuente": fuente_ine(T_IPV_2015, "Índice de Precios de Vivienda, "
-                                         "Comunitat Valenciana"),
+        "fuente": fuente_ine(T_IPV, "Índice de Precios de Vivienda, "
+                                    "Comunitat Valenciana"),
         "nota": "El IPV solo baja a CCAA; se usa como evolución porcentual, "
-                "no como nivel local.",
-        **out,
+                "no como nivel local. El INE rebasa el índice cada pocos años: "
+                "los niveles no son comparables entre bases, las variaciones sí.",
+        "tabla": T_IPV, "serie": got[0]["COD"], "trimestral": trim,
     })
-    log(f"IPV: {len(out['base_2015']['trimestral'])} trimestres (base 2015)")
+    log(f"IPV: {len(trim)} trimestres, último {sorted(trim)[-1]}")
 
 
 SECCION_RE = re.compile(r"castello de la plana seccion (\d{5})\.")
@@ -240,7 +230,9 @@ def fetch_adrh():
         elif mdis:
             for y, v in anual.items():
                 distritos.setdefault(mdis.group(1), {}).setdefault(y, {})[ind] = v
-        elif re.search(r"castello de la plana\.", n):
+        # el INE pasó a nombrar el municipio "Castelló de la Plana/Castellón
+        # de la Plana"; sin la variante bilingüe no se encuentra la serie
+        elif re.search(r"castello de la plana(/castellon de la plana)?\.", n):
             for y, v in anual.items():
                 muni.setdefault(y, {})[ind] = v
 

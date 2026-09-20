@@ -437,7 +437,7 @@ def ultimo_dato(clave, datos):
             return ultimo(datos["mensual"] if clave == "compraventas"
                           else datos["mensual"]["numero"])
         if clave == "ipv":
-            return ultimo(datos["base_2015"]["trimestral"])
+            return ultimo(datos["trimestral"])
         if clave == "renta_adrh":
             return ultimo(datos["municipio"]["series"])
         if clave == "desahucios":

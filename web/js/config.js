@@ -36,11 +36,11 @@ window.CONFIG = {
     2025: 100.0,
   },
   // Últim IPC mensual disponible (per a l'equivalència "a dia de hui").
-  IPC_ULTIM: { etiqueta: "maig 2026", valor: 103.046 },
+  IPC_ULTIM: { etiqueta: "agost 2026", valor: 104.91 },
 
   // IRAV: límit legal de pujada anual del lloguer per a contractes posteriors
   // al 25/05/2023 (Llei 12/2023). Font: INE, taula 72975 (dada maig 2026).
-  IRAV: { pct: 2.48, etiqueta: "maig 2026" },
+  IRAV: { pct: 2.47, etiqueta: "agost 2026" },
 
   // Entrada d'una compra: 20% no finançat + ~10% de despeses i impostos,
   // estalviant el 15% del sou net. Paràmetres del càlcul, no dades.
