@@ -19,6 +19,11 @@ ZIP = CACHE_DIR / "secciones_ine.zip"
 SHP_BASE = CACHE_DIR / "SECC_CE_20210101_INE_WM"
 TOLERANCIA_M = 4  # metros: imperceptible a escala de ciudad
 
+# Secciones del municipio que NO se dibujan en el mapa: las islas Columbretes
+# (09-001) están a ~50 km de la costa y, al entrar en el encuadre, dejaban la
+# ciudad reducida a una mancha en una esquina. Sus datos siguen en los JSON.
+SECCIONES_FUERA = {"1204009001"}
+
 R = 6378137.0
 
 
@@ -59,6 +64,8 @@ def main():
     features = []
     for sr in sf.iterShapeRecords():
         if sr.record[i_cumun] != CUMUN_CASTELLO:
+            continue
+        if sr.record[i_cusec] in SECCIONES_FUERA:
             continue
         shape = sr.shape
         partes = list(shape.parts) + [len(shape.points)]
