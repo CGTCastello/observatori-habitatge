@@ -5,17 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Observatori de l'Habitatge de Castelló — Preu del lloguer, salaris i desnonaments amb dades oficials</title>
 <meta name="description" content="Preu real del lloguer, salaris, desnonaments i vivenda turística a Castelló de la Plana amb dades oficials (SERPAVI, INE, AEAT, CGPJ). Calcula quant et costa viure.">
-<link rel="canonical" href="https://cgtcastello.org/observatori-habitatge/">
+<link rel="canonical" href="https://observatori.cgtcastello.org/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ca_ES">
 <meta property="og:site_name" content="Observatori de l'Habitatge de Castelló">
 <meta property="og:title" content="Quant et costa viure a Castelló? Les dades oficials de la vivenda">
 <meta property="og:description" content="El lloguer real ha pujat un 59% des de 2015; els salaris, un 36%. Dades oficials de lloguer, salaris i desnonaments, i una calculadora per a la teua situació.">
-<meta property="og:url" content="https://cgtcastello.org/observatori-habitatge/">
-<meta property="og:image" content="https://cgtcastello.org/observatori-habitatge/img/og-va.png">
+<meta property="og:url" content="https://observatori.cgtcastello.org/">
+<meta property="og:image" content="https://observatori.cgtcastello.org/img/og-observatori.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Observatori de l'Habitatge de CGT Castelló: des de 2015 el lloguer ha pujat un 59% i els salaris un 36%; el 32,9% de la renda neta se'n va al lloguer i hi ha hagut 10.873 desnonaments executats.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1b1a18">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Open+Sans:wght@400;600;700;800&display=swap">
@@ -35,7 +38,7 @@
     {
       "@type": "WebSite",
       "name": "Observatori de l'Habitatge de Castelló",
-      "url": "https://cgtcastello.org/observatori-habitatge/",
+      "url": "https://observatori.cgtcastello.org/",
       "inLanguage": "ca",
       "publisher": { "@id": "https://cgtcastello.org/#org" }
     },
@@ -43,56 +46,56 @@
       "@type": "Dataset",
       "name": "Lloguer real a Castelló de la Plana (SERPAVI)",
       "description": "Sèrie anual 2011-2024 del lloguer de contractes reals declarats fiscalment a Castelló de la Plana i província: mediana, P25 i P75 de €/m²/mes i €/mes, per municipi i secció censal.",
-      "url": "https://cgtcastello.org/observatori-habitatge/#lloguer",
+      "url": "https://observatori.cgtcastello.org/#lloguer",
       "creator": { "@id": "https://cgtcastello.org/#org" },
       "isBasedOn": "https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/serpavi",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": [{
         "@type": "DataDownload",
         "encodingFormat": "application/json",
-        "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/alquiler_serpavi.json"
+        "contentUrl": "https://observatori.cgtcastello.org/data/alquiler_serpavi.json"
       }]
     },
     {
       "@type": "Dataset",
       "name": "Salaris i taxa d'esforç a Castelló",
       "description": "Salari mitjà anual de la província de Castelló (AEAT, 2008-2024), distribució per trams d'SMI i taxa d'esforç del lloguer sobre el salari net estimat.",
-      "url": "https://cgtcastello.org/observatori-habitatge/#salaris",
+      "url": "https://observatori.cgtcastello.org/#salaris",
       "creator": { "@id": "https://cgtcastello.org/#org" },
       "isBasedOn": "https://sede.agenciatributaria.gob.es/Sede/datosabiertos/catalogo/hacienda/Mercado_de_Trabajo_y_Pensiones_en_las_Fuentes_Tributarias.shtml",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": [{
         "@type": "DataDownload",
         "encodingFormat": "application/json",
-        "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/salarios_aeat.json"
+        "contentUrl": "https://observatori.cgtcastello.org/data/salarios_aeat.json"
       }]
     },
     {
       "@type": "Dataset",
       "name": "Desnonaments a la província de Castelló",
       "description": "Llançaments practicats per trimestre i causa (lloguer LAU, execució hipotecària, altres) a la província de Castelló des de 2013, i sèrie anual del partit judicial de Castelló de la Plana. Font: CGPJ.",
-      "url": "https://cgtcastello.org/observatori-habitatge/#desnonaments",
+      "url": "https://observatori.cgtcastello.org/#desnonaments",
       "creator": { "@id": "https://cgtcastello.org/#org" },
       "isBasedOn": "https://www.poderjudicial.es/cgpj/es/Temas/Estadistica-Judicial/Estudios-e-Informes/Efecto-de-la-Crisis-en-los-organos-judiciales/",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": [{
         "@type": "DataDownload",
         "encodingFormat": "application/json",
-        "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/indicadores.json"
+        "contentUrl": "https://observatori.cgtcastello.org/data/indicadores.json"
       }]
     },
     {
       "@type": "Dataset",
       "name": "Renda i lloguer per seccions censals de Castelló de la Plana",
       "description": "Renda neta mitjana per persona i llar (ADRH, INE) i lloguer €/m² (SERPAVI) per a les 110 seccions censals de Castelló de la Plana.",
-      "url": "https://cgtcastello.org/observatori-habitatge/#mapa",
+      "url": "https://observatori.cgtcastello.org/#mapa",
       "creator": { "@id": "https://cgtcastello.org/#org" },
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": [
         { "@type": "DataDownload", "encodingFormat": "application/json",
-          "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/mapa_renta.json" },
+          "contentUrl": "https://observatori.cgtcastello.org/data/mapa_renta.json" },
         { "@type": "DataDownload", "encodingFormat": "application/json",
-          "contentUrl": "https://cgtcastello.org/observatori-habitatge/data/mapa_alquiler.json" }
+          "contentUrl": "https://observatori.cgtcastello.org/data/mapa_alquiler.json" }
       ]
     },
     {

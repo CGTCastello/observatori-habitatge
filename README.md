@@ -18,13 +18,16 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/fetch_cartografia.py  # GeoJSON secciones censales (mapa)
 .venv/bin/python scripts/build_all.py       # indicadores derivados + meta.json
 .venv/bin/python scripts/fetch_censo.py     # Censo 2021: parque y tenencia municipal
-.venv/bin/python scripts/gen_og.py          # OG image para redes (web/img/)
 .venv/bin/python scripts/gen_fichas.py      # fichas municipales (formacion/fichas/)
 ```
 
 `build_all.py --fetch` ejecuta antes todos los fetchers. Cada indicador tiene
 un test de rango plausible (dict `RANGOS`): si un valor se sale, el build
 aborta sin publicar nada.
+
+La imagen para compartir en redes (`web/img/og-observatori.png`, 1200x630) se
+diseña a mano: antes la generaba `gen_og.py`, que se ha retirado para que un
+build no la sobrescriba. Si cambian las cifras que muestra, hay que rehacerla.
 
 `scripts/manual_inputs.csv` guarda los datos introducidos a mano (SMI, precios
 de oferta de portales) con fuente y URL por fila.
